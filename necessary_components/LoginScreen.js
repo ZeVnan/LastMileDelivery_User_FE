@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { View, TextInput, Text, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { Button } from 'react-native-elements';
 
-const LoginScreen = () => {
+const LoginScreen = ({onLogin}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // Xử lý logic đăng nhập
+    onLogin();
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      <View style={styles.formContainer}>
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           placeholder="Enter your email"
           value={email}
           onChangeText={setEmail}
         />
-
         <TextInput
           style={styles.input}
           placeholder="Enter your password"
@@ -26,12 +26,12 @@ const LoginScreen = () => {
           value={password}
           onChangeText={setPassword}
         />
-
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+      <Button
+        title="Login" 
+        onPress={handleLogin}
+      />
+    </View>
   );
 };
 
@@ -41,24 +41,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 20,
   },
-  formContainer: {
-    justifyContent: 'center',
-    flex: 1
+  inputContainer: {
+    flex: 1,
+    justifyContent:'center',
   },
   input: {
     height: 40,
     backgroundColor: '#f2f2f2',
     padding: 10,
     marginBottom: 10,
-  },
-  loginButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
-  },
-  loginButtonText: {
-    color: '#fff',
-    textAlign: 'center',
   },
 });
 

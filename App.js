@@ -1,29 +1,53 @@
 import { Text, SafeAreaView, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// You can import supported modules from npm
-import { Card } from 'react-native-paper';
+import HomeScreen from './necessary_components/HomeScreen';
+import ChatScreen from './necessary_components/ChatScreen';
+import SendInfoScreen from './necessary_components/SendInfoScreen';
+import ReceiveInfoScreen from './necessary_components/ReceiveInfoScreen';
+import CheckOutScreen from './necessary_components/CheckOutScreen';
+import OrderHisToryScreen from './necessary_components/OrderHistoryScreen';
+import OrderDetailScreen from './necessary_components/OrderDetailScreen';
+import ProfileScreen from './necessary_components/ProfileScreen';
+import LoginScreen from './necessary_components/LoginScreen';
+import ReviewScreen from './necessary_components/ReviewScreen'
+import { useState } from 'react';
 
-// or any files within the Snack
-import LoginScreen from './components/LoginScreen'
-import HomePageScreen from './components/HomePageScreen'
-import PickupLocationScreen from './components/PickUpLocationScreen'
-import SendPackageScreen from './components/SendPackageScreen'
-import SendPackageScreen2 from './components/SendPackageScreen2'
-import CheckOutScreen from './components/CheckOutScreen'
-import TrackingScreen from './components/TrackingScreen'
-import OrderHistoryScreen from './components/OrderHistoryScreen'
-import OrderDetailScreen from './components/OrderDetailScreen'
-import ReviewScreen from './components/ReviewScreen'
-import ProfileScreen from './components/ProfileScreen'
-import EditProfileScreen from './components/EditProfileScreen'
-import NotificationScreen from './components/NotificationScreen'
-import AddressScreen from './components/AddressScreen'
-import AddAddressScreen from './components/AddAddressScreen'
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  }
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  }
+  if (!isLoggedIn){
+    return (
+      <SafeAreaView style={styles.container}>
+        <LoginScreen onLogin={handleLogin}/>
+      </SafeAreaView>
+    )
+  }
   return (
     <SafeAreaView style={styles.container}>
-      <AddAddressScreen />
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen name="Home" component={HomeScreen}/>
+          <Stack.Screen name="Chat" component={ChatScreen}/>
+          <Stack.Screen name="Send Confirmation" component={SendInfoScreen}/>
+          <Stack.Screen name="Receive Confirmation" component={ReceiveInfoScreen}/>
+          <Stack.Screen name="CheckOut" component={CheckOutScreen}/>
+          <Stack.Screen name="Order History" component={OrderHisToryScreen}/>
+          <Stack.Screen name="Order Detail" component={OrderDetailScreen}/>
+          <Stack.Screen name="Profile">
+            {props => <ProfileScreen {...props} onLogout={handleLogout}/>}
+          </Stack.Screen>
+          <Stack.Screen name="Review" component={ReviewScreen}/>
+        </Stack.Navigator>
+      </NavigationContainer>
     </SafeAreaView>
   );
 }

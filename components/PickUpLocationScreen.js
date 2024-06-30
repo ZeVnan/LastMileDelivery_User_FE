@@ -1,20 +1,34 @@
 import React, { useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { Location } from 'expo-location';
+import * as Location from 'expo-location';
 
-const PickUpLocationScreen = () => {
+const PickUpLocationScreen = ({navigation}) => {
   const [location, setLocation] = useState(null);
+  const [address, setAddress] = useState('');
 
-  const handleSelectLocation = (event) => {
-    setLocation({
+  const handleSelectLocation = async (event) => {
+    const selectedLocation = {
       latitude: event.nativeEvent.coordinate.latitude,
       longitude: event.nativeEvent.coordinate.longitude,
-    });
+    };
+    setLocation(selectedLocation);
+
+    const geocode = await Location.reverseGeocodeAsync(selectedLocation);
+    const selectedAddress = geocode[0];
+    const addressString = `${selectedAddress.name}, ${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.region}, ${selectedAddress.country}`;
+    setAddress(addressString);
+  };
+  const handleConfirmPickUpAddress = () => {
+    // TODO: Implement actual sending logic
+    navigation.navigate('Send Confirmation');
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={ styles.container}>
+      <View style={{ padding: 10 }}>
+        {address ? <Text>Selected Address: {address}</Text> : <Text>Select a location on the map</Text>}
+      </View>
       <MapView
         style={{ flex: 1 }}
         initialRegion={{
@@ -28,9 +42,18 @@ const PickUpLocationScreen = () => {
       >
         {location && <Marker coordinate={location} />}
       </MapView>
-      <Button title="Confirm Pickup Address" />
+      <Button 
+        title="Confirm Pickup Address" 
+        onPress={handleConfirmPickUpAddress}
+      />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+      flex: 1,
+  },
+});
 
 export default PickUpLocationScreen;
