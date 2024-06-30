@@ -130,6 +130,7 @@ const SendInfoScreen = ({navigation}) => {
         <Button
           title="Help With Packaging"
           onPress={() => navigation.navigate('Chat')}
+          type='clear'
         />
       </ScrollView>
       <Button title="Confirm Send Information" onPress={handleSendPackage} />

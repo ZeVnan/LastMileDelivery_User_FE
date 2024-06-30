@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, FlatList } from 'react-native';
 import { Button } from 'react-native-elements';
-import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
 
 const ReviewScreen = ({navigation}) => {
   const [starCount, setStarCount] = useState(0);
@@ -12,8 +12,23 @@ const ReviewScreen = ({navigation}) => {
     setStarCount(rating);
   };
 
-  const handleUploadPhoto = () => {
-    
+  const handleUploadPhoto = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled){
+      setImages([...images, result]);
+    }
   };
 
   const handleSubmitReview = () => {
@@ -32,15 +47,17 @@ const ReviewScreen = ({navigation}) => {
           onPress={handleUploadPhoto}
           type='clear'
         />
-        <FlatList
-          style={styles.imageContainer}
-          data={images}
-          renderItem={({ item }) => (
-            <Image source={{ uri: item.uri }} style={styles.uploadedImage} />
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          horizontal
-        />
+        <View style={styles.imageContainer}>
+          <FlatList
+            data={images}
+            renderItem={({ item }) => (
+              <Image source={{ uri: item.assets[0].uri }} style={styles.uploadedImage} />
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            horizontal
+          />
+        </View>
+        
 
         <Text style={styles.title}>Add Message</Text>
         <TextInput
@@ -87,14 +104,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   uploadedImage: {
-    width: 100,
-    height: 100,
+    width: 300,
+    height: 300,
     margin: 10,
     borderRadius: 8,
+    alignSelf: 'center'
   },
   imageContainer: {
     marginVertical: 20,
-    borderWidth: 1,
+    height: 300
   },
 });
 

@@ -49,7 +49,7 @@ const ChatScreen = ({navigation}) => {
           _id: 1,
           name: 'You',
         },
-        image: result.assets[0].uri, // Sử dụng result.assets[0].uri cho đúng URI
+        image: result.assets[0].uri,
       };
       onSend([imageMessage]);
     }
@@ -63,7 +63,6 @@ const ChatScreen = ({navigation}) => {
     });
 
     if (!result.canceled) {
-      console.log('Image URI from camera:', result.uri); // Logging URI
       const imageMessage = {
         _id: Math.random().toString(36).substring(7),
         createdAt: new Date(),
@@ -71,7 +70,7 @@ const ChatScreen = ({navigation}) => {
           _id: 1,
           name: 'You',
         },
-        image: result.uri,
+        image: result.assets[0].uri,
       };
       onSend([imageMessage]);
     }
