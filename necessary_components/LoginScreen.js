@@ -1,13 +1,34 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 
 const LoginScreen = ({onLogin}) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    onLogin();
+  const handleLogin = async () => {
+    try{
+      const response = await fetch('https://waseminarcnpm.azurewebsites.net/auth/sign-in',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        }),
+      });
+      //const result = await response.json();
+      if (response.ok){
+        onLogin();
+      }
+      else{
+        Alert.alert("Login Failed");
+      }
+    }
+    catch (error){
+      Alert.alert("Something went wrong");
+    }
   };
 
   return (
@@ -15,13 +36,13 @@ const LoginScreen = ({onLogin}) => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Enter your email"
-          value={email}
-          onChangeText={setEmail}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
         />
         <TextInput
           style={styles.input}
-          placeholder="Enter your password"
+          placeholder="Password"
           secureTextEntry={true}
           value={password}
           onChangeText={setPassword}
@@ -29,7 +50,7 @@ const LoginScreen = ({onLogin}) => {
       </View>
       <Button
         title="Login" 
-        onPress={handleLogin}
+        onPress={onLogin}
       />
     </View>
   );

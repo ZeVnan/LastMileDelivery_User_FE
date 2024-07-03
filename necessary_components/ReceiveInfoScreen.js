@@ -1,50 +1,66 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 
-const ReceiveInfoScreen = ({navigation}) => {
-  const [name, setName] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [address, setAddress] = useState('');
-  const [message, setMessage] = useState('');
+const ReceiveInfoScreen = ({navigation, route}) => {
+  const [receiveInfoForm, setReceiveInfoForm] = useState({
+    receiverName: "",
+    receiverMobileNumber: "",
+    receiverAddress: "",
+    message: "",
+  })
+  const {sendInfo} = route.params;
 
   const handleSendPackage = () => {
-    navigation.navigate('CheckOut');
+    if (receiveInfoForm.receiverName === ""){
+      Alert.alert("Missing information", "Receiver name is missing");
+      return;
+    }
+    if (!/^\d{11}$/.test(receiveInfoForm.receiverMobileNumber)){
+      Alert.alert("Missing information", "Receiver phone number must have correct phone number format");
+      return;
+    }
+    if (receiveInfoForm.receiverAddress === ""){
+      Alert.alert("Missing information", "Receiver address is missing");
+      return;
+    }
+    navigation.navigate('CheckOut', {sendInfo: sendInfo, receiveInfo: receiveInfoForm});
   };
 
   return (
     <View style = { styles.container}>
-      <ScrollView>
+      <View style={{flex: 1}}>
         <Text style = { styles.title }>Receiver Details</Text>
 
         <TextInput
           style = { styles.input }
-          placeholder="Enter Name"
-          value={name}
-          onChangeText={setName}
+          placeholder="Receiver Name"
+          value={receiveInfoForm.receiverName}
+          onChangeText={(value) => setReceiveInfoForm({...receiveInfoForm, receiverName: value})}
         />
 
         <TextInput
           style = { styles.input }
-          placeholder="Enter Mobile Number"
-          value={mobileNumber}
-          onChangeText={setMobileNumber}
+          placeholder="Receiver Mobile Number"
+          value={receiveInfoForm.receiverMobileNumber}
+          onChangeText={(value) => setReceiveInfoForm({...receiveInfoForm, receiverMobileNumber: value})}
+          keyboardType="numeric"
         />
 
         <TextInput
           style = { styles.input }
-          placeholder="Enter Address"
-          value={address}
-          onChangeText={setAddress}
+          placeholder="Receiver Address"
+          value={receiveInfoForm.receiverAddress}
+          onChangeText={(value) => setReceiveInfoForm({...receiveInfoForm, receiverAddress: value})}
         />
 
         <TextInput
           style = { styles.input }
           placeholder="Enter Message"
-          value={message}
-          onChangeText={setMessage}
+          value={receiveInfoForm.message}
+          onChangeText={(value) => setReceiveInfoForm({...receiveInfoForm, message: value})}
         />
-      </ScrollView>
+      </View>
       <Button title="Confirm Receive Information" onPress={handleSendPackage} />
     </View>
   );

@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import { Button } from 'react-native-elements';
 
-const CheckOutScreen = () => {
+const CheckOutScreen = ({route}) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Master Card');
+  const {sendInfo, receiveInfo} = route.params;
+  
 
   const handlePayNow = () => {
     // Implement payment processing logic here
-    console.log('Payment processing...');
+    
   };
+  const shippingFees = {
+    Document: 1.00,
+    Package: 5.00 * sendInfo.packageSize * 0.1,
+    Parcel: 2.50 * sendInfo.packageSize * 0.1,
+  }
+  const deliveryFees = {
+    Standard: 0.75,
+    Express: 3.00,
+    SameDay: 8.00,
+  }
+  const shippingFee = shippingFees[sendInfo.shipmentType] || 0;
+  const deliveryFee = deliveryFees[sendInfo.deliveryType] || 0;
+  const discount = 2.00;
+  const value = 10.00;
+  const total = value + shippingFee + deliveryFee - discount;
 
   return (
     <View style={styles.container}>
@@ -20,26 +37,26 @@ const CheckOutScreen = () => {
             From:
           </Text>
           <Text style={ styles.orderName}>
-            Johnson Smith
+            {sendInfo.senderName}
           </Text>
           <Text style={ styles.orderAddress}>
-            4517 Washington Ave. Manchester, Kentucky 39495
+            {sendInfo.senderAddress}
           </Text>
           <Text style={ styles.orderPhoneNumber}>
-          (209) 555-0104
+            {sendInfo.senderMobileNumber}
           </Text>
 
           <Text style={ styles.orderInfo}>
             To:
           </Text>
           <Text style={ styles.orderName}>
-            Arlene McCoy
+            {receiveInfo.receiverName}
           </Text>
           <Text style={ styles.orderAddress}>
-            8502 Preston Rd. Inglewood, Maine 98380
+            {receiveInfo.receiverAddress}
           </Text>
           <Text style={ styles.orderPhoneNumber}>
-            (308) 555-0121
+            {receiveInfo.receiverMobileNumber}
           </Text>
 
         </View>
@@ -77,16 +94,20 @@ const CheckOutScreen = () => {
         <View style={styles.itemContainer}>
           <Text style={styles.itemTitle}>Summary</Text>
           <View style={styles.orderSummaryRow}>
-            <Text style={styles.orderSummaryLabel}>Shipping Fee</Text>
-            <Text style={styles.orderSummaryValue}>$3.00</Text>
+            <Text style={styles.orderSummaryLabel}>Value</Text>
+            <Text style={styles.orderSummaryValue}>${value}</Text>
+          </View>
+          <View style={styles.orderSummaryRow}>
+            <Text style={styles.orderSummaryLabel}>Transport Fee</Text>
+            <Text style={styles.orderSummaryValue}>${shippingFee + deliveryFee}</Text>
           </View>
           <View style={styles.orderSummaryRow}>
             <Text style={styles.orderSummaryLabel}>Discount</Text>
-            <Text style={styles.orderSummaryValue}>-$2.00</Text>
+            <Text style={styles.orderSummaryValue}>-${discount}</Text>
           </View>
           <View style={styles.orderSummaryRow}>
             <Text style={styles.orderSummaryLabel}>Total</Text>
-            <Text style={styles.orderSummaryValue}>$3.02</Text>
+            <Text style={styles.orderSummaryValue}>${total}</Text>
           </View>
         </View>
       </ScrollView>
