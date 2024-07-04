@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Button } from 'react-native-elements';
+import axios from 'axios';
 
 const SendInfoScreen = ({navigation}) => {
   const [sendInfoForm, setSendInfoForm] = useState({
@@ -49,7 +50,7 @@ const SendInfoScreen = ({navigation}) => {
       Alert.alert("Wrong format", "Sender phone number must have correct phone number format");
       return;
     }
-    if (sendInfoForm.senderAddress === ""){
+    if (sendInfoForm.senderAddress === "" || addressString === ""){
       Alert.alert("Missing information", "Sender address is missing");
       return;
     }
@@ -84,6 +85,37 @@ const SendInfoScreen = ({navigation}) => {
     setSendInfoForm({ ...sendInfoForm, shipmentType: selectedShipmentType });
   }, [selectedShipmentType]);
 
+  const [location, setLocation] = useState(null);
+  const apiKey = '1ac6150e984944cca2b8066620759a85';
+  const [addressString, setAddressString] = useState("");
+  useEffect(() => {
+    getGeocodingData()
+  }, [sendInfoForm.senderAddress]);
+  useEffect(() => {
+    if (location === null)
+      return;
+    const housenumber = location.housenumber === undefined ? '' : `${location.housenumber}, `;
+    const street = location.street === undefined ? '' : `${location.street}, `;
+    const district = location.district === undefined ? '' : `${location.district}, `;
+    const city = location.city === undefined ? '' : `${location.city}, `;
+    const state = location.state === undefined ? '' : `${location.state}, `;
+    const country = location.country === undefined ? '.' : `${location.country}. `;
+    setAddressString(`${housenumber}${street}${district}${city}${state}${country}`);
+    if (sendInfoForm.senderAddress.length === 0){
+      setAddressString("");
+    }
+  }, [location])
+
+  const getGeocodingData = async () => {
+    const response = await axios.get(`https://api.geoapify.com/v1/geocode/search?text=${sendInfoForm.senderAddress}&apiKey=${apiKey}`)
+    .then((response) => {
+      setLocation(response.data.features[0].properties);
+    })
+    .catch((error) => {
+      
+    });
+  }
+  
   return (
     <View style={styles.container}>
       <View style={{flex: 1}}>
@@ -109,6 +141,16 @@ const SendInfoScreen = ({navigation}) => {
           value={sendInfoForm.senderAddress}
           onChangeText={(value) => setSendInfoForm({...sendInfoForm, senderAddress: value})}
         />
+        {addressString !== "" && sendInfoForm.senderAddress !== "" && location !== null && (
+        <View styles={{flexDirection: 'row',}}>
+          <Text style={styles.suggested}>Suggested: {addressString}</Text>
+          <Button
+            title="Use suggestion" 
+            onPress={() => setSendInfoForm({...sendInfoForm, senderAddress: addressString})}
+            type='clear'
+          />
+        </View>
+        )}
 
         <Text style={styles.title}>Pick Up Time</Text>
         <View style = {styles.pickerContainer2}>
@@ -208,6 +250,12 @@ const styles = StyleSheet.create({
     alignSelf:'center',
     fontSize: 16
   },
+  suggested: {
+    marginBottom: 20,
+    marginHorizontal: 20,
+    fontSize: 16,
+    fontWeight: '200'
+  }
 });
 
 export default SendInfoScreen;

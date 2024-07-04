@@ -50,7 +50,7 @@ const LoginScreen = ({onLogin}) => {
       </View>
       <Button
         title="Login" 
-        onPress={onLogin}
+        onPress={handleLogin}
       />
     </View>
   );
