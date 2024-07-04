@@ -86,8 +86,10 @@ const SendInfoScreen = ({navigation}) => {
   }, [selectedShipmentType]);
 
   const [location, setLocation] = useState(null);
+  const [locations, setLocations] = useState([]);
   const apiKey = '1ac6150e984944cca2b8066620759a85';
   const [addressString, setAddressString] = useState("");
+  const [suggestedLocationIndex, setSuggestedLocationIndex] = useState(0);
   useEffect(() => {
     getGeocodingData()
   }, [sendInfoForm.senderAddress]);
@@ -109,6 +111,7 @@ const SendInfoScreen = ({navigation}) => {
   const getGeocodingData = async () => {
     const response = await axios.get(`https://api.geoapify.com/v1/geocode/search?text=${sendInfoForm.senderAddress}&apiKey=${apiKey}`)
     .then((response) => {
+      setLocations(response.data.features);
       setLocation(response.data.features[0].properties);
     })
     .catch((error) => {
@@ -142,13 +145,28 @@ const SendInfoScreen = ({navigation}) => {
           onChangeText={(value) => setSendInfoForm({...sendInfoForm, senderAddress: value})}
         />
         {addressString !== "" && sendInfoForm.senderAddress !== "" && location !== null && (
-        <View styles={{flexDirection: 'row',}}>
+        <View>
           <Text style={styles.suggested}>Suggested: {addressString}</Text>
-          <Button
-            title="Use suggestion" 
-            onPress={() => setSendInfoForm({...sendInfoForm, senderAddress: addressString})}
-            type='clear'
-          />
+          <View styles={{flexDirection: 'row',}}>
+            <Button
+              title="Use suggestion" 
+              onPress={() => setSendInfoForm({...sendInfoForm, senderAddress: addressString})}
+              type='clear'
+            />
+            {locations.length > 1 && (
+              <Button
+                title="Other suggestion" 
+                onPress={() => {
+                  setSuggestedLocationIndex(suggestedLocationIndex + 1)
+                  if (suggestedLocationIndex >= locations.length - 1){
+                    setSuggestedLocationIndex(0);
+                  }
+                  setLocation(locations[suggestedLocationIndex].properties);
+                }}
+                type='clear'
+              />
+            )}
+          </View>
         </View>
         )}
 

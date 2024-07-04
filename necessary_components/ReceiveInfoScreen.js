@@ -29,8 +29,10 @@ const ReceiveInfoScreen = ({navigation, route}) => {
   };
 
   const [location, setLocation] = useState(null);
+  const [locations, setLocations] = useState([]);
   const apiKey = '1ac6150e984944cca2b8066620759a85';
   const [addressString, setAddressString] = useState("");
+  const [suggestedLocationIndex, setSuggestedLocationIndex] = useState(0);
   useEffect(() => {
     getGeocodingData()
   }, [receiveInfoForm.receiverAddress]);
@@ -52,7 +54,8 @@ const ReceiveInfoScreen = ({navigation, route}) => {
   const getGeocodingData = async () => {
     const response = await axios.get(`https://api.geoapify.com/v1/geocode/search?text=${receiveInfoForm.receiverAddress}&apiKey=${apiKey}`)
     .then((response) => {
-      setLocation(response.data.features[0].properties);
+      setLocations(response.data.features);
+      setLocation(locations[0].properties)
     })
     .catch((error) => {
       
@@ -87,13 +90,28 @@ const ReceiveInfoScreen = ({navigation, route}) => {
         />
 
         {addressString !== "" && receiveInfoForm.receiverAddress !== "" && location !== null && (
-          <View styles={{flexDirection: 'row',}}>
-            <Text style={styles.suggested}>Suggested: {addressString}</Text>
+          <View>
+             <Text style={styles.suggested}>Suggested: {addressString}</Text>
+             <View styles={{flexDirection: 'row',}}>
             <Button
               title="Use suggestion" 
               onPress={() => setReceiveInfoForm({...receiveInfoForm, receiverAddress: addressString})}
               type='clear'
             />
+            {locations.length > 1 && (
+              <Button
+              title="Other suggestion" 
+              onPress={() => {
+                setSuggestedLocationIndex(suggestedLocationIndex + 1)
+                if (suggestedLocationIndex >= locations.length - 1){
+                  setSuggestedLocationIndex(0);
+                }
+                setLocation(locations[suggestedLocationIndex].properties);
+              }}
+              type='clear'
+            />
+            )}
+          </View>
           </View>
         )}
 
