@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Button } from 'react-native-elements';
+import { UserContext } from './UserContext';
 
 const HomeScreen = ({navigation}) => {
+  const { userRole } = useContext(UserContext);
   return (
     <View style={ styles.container}>
       <View style={ styles.rowContainer}>
-        <View style={styles.itemContainer}>
-          <Button
-            title="Send Package"
-            onPress={() => navigation.navigate('Send Confirmation')}
-          />
-        </View>
+        {userRole === "sender" && (
+          <View style={styles.itemContainer}>
+            <Button
+              title="Send Package"
+              onPress={() => navigation.navigate('Send Confirmation')}
+            />
+          </View>
+        )}
         <View style={styles.itemContainer}>
           <Button
             title="Order History"

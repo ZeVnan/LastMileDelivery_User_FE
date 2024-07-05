@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
+import { UserContext } from './UserContext';
 
 const OrderHistoryScreen = ({navigation}) => {
   const [pendingOrders, setPendingOrders] = useState([]);
   const [completedOrders, setCompletedOrders] = useState([]);
-  const [selectedTab, setSelectedTab] = useState('pending');
+  const [selectedTab, setSelectedTab] = useState("pending");
+  const { userId } = useContext(UserContext);
 
   const handleTabChange = (newTab) => {
     setSelectedTab(newTab);
   };
 
   useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/todos')
-      .then(response => response.json())
-      .then(json => setPendingOrders(json));
+    getOrder(userId, "pending")
   }, []);
+  useEffect(() =>{
+    getOrder(userId, "completed")
+  }, [])
 
   useEffect(() => {
     fetch('https://jsonplaceholder.typicode.com/todos')
@@ -23,20 +26,52 @@ const OrderHistoryScreen = ({navigation}) => {
       .then(json => setCompletedOrders(json));
   }, []);
 
+  const getOrder = async(userId, status) => {
+    try{
+      const response = await fetch('https://waseminarcnpm.azurewebsites.net/getOrderByUserIdAndStatus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, status }),
+      });
+      if (response.ok){
+        const result = await response.json();
+        if (status === "pending"){
+          setPendingOrders(result.orders)
+        }
+        else if (status === "completed"){
+          setCompletedOrders(result.orders)
+        }
+      }
+      else{
+        if (status === "pending"){
+          Alert.alert("Error", "Cannot load pending orders")
+        }
+        else if (status === "completed"){
+          Alert.alert("Error", "Cannot load completed orders")
+        }
+      }
+    }
+    catch(error){
+      Alert.alert("Error", "Something went wrong")
+    }
+  }
+
   const renderItem = ({ item, isCompleted }) => (
     <View style={styles.order}>
-      <Text style={styles.trackingId}>Tracking ID: {item.id}</Text>
-      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.trackingId}>Tracking ID: {item._id}</Text>
+      <Text style={styles.title}>{item.packageSize}kg package</Text>
       <View style={styles.addressContainer}>
-        <Text style={styles.address}>Sender Address</Text>
+        <Text style={styles.address}>{item.senderInfo.address}</Text>
         <Text style={styles.address}>To</Text>
-        <Text style={styles.address}>Receiver Address</Text>
+        <Text style={styles.address}>{item.receiverInfo.address}</Text>
       </View>
       <View style={styles.statusContainer}>
-        <Text style={styles.status}>Status</Text>
+        <Text style={styles.status}>{item.status}</Text>
         <Button 
           title="View Details" 
-          onPress={() => navigation.navigate('Order Detail')}
+          onPress={() => navigation.navigate('Order Detail',{item: item })}
           type='clear'  
           titleStyle={{ fontSize: 13 }}
         />
@@ -75,14 +110,14 @@ const OrderHistoryScreen = ({navigation}) => {
         <FlatList
           data={pendingOrders}
           renderItem={renderPendingItem}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item._id}
         />
       )}
       {selectedTab === 'completed' && (
         <FlatList
           data={completedOrders}
           renderItem={renderCompletedItem}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item._id}
         />
       )}
     </View>

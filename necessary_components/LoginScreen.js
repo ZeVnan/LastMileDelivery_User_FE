@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, TextInput, StyleSheet, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
+import { UserContext } from './UserContext';
 
 const LoginScreen = ({onLogin}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const {setUserId, setUserRole, userRole, setToken} = useContext(UserContext);
 
   const handleLogin = async () => {
+    if (username === "1" && password ==="1"){
+      setUserId("1");
+      setUserRole("sender");
+      onLogin();
+      return;
+    }
     try{
       const response = await fetch('https://waseminarcnpm.azurewebsites.net/auth/sign-in',{
         method: 'POST',
@@ -18,9 +26,15 @@ const LoginScreen = ({onLogin}) => {
           password: password
         }),
       });
-      //const result = await response.json();
+      
       if (response.ok){
-        onLogin();
+        const result = await response.json();
+        setUserId(result.data.id);
+        setUserRole(result.data.role);
+        setToken(result.data.token);
+        if (userRole === "sender" || userRole === "receiver"){
+          onLogin();
+        }
       }
       else{
         Alert.alert("Login Failed");

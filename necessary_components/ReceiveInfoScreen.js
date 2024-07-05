@@ -4,15 +4,22 @@ import { Button } from 'react-native-elements';
 import axios from 'axios';
 
 const ReceiveInfoScreen = ({navigation, route}) => {
+  const [receiverUsername, setReceiverUsername] =useState("");
   const [receiveInfoForm, setReceiveInfoForm] = useState({
     receiverName: "",
     receiverMobileNumber: "",
     receiverAddress: "",
+    receiverId: "",
     message: "",
   })
   const {sendInfo} = route.params;
 
   const handleSendPackage = () => {
+    getUserId();
+    if (receiveInfoForm.receiverId === ""){
+      Alert.alert("Missing data", "Receiver username is missing or not found");
+      return;
+    }
     if (receiveInfoForm.receiverName === ""){
       Alert.alert("Missing information", "Receiver name is missing");
       return;
@@ -62,10 +69,38 @@ const ReceiveInfoScreen = ({navigation, route}) => {
     });
   }
 
+  const getUserId = async() => {
+    try{
+      const response = await fetch('https://waseminarcnpm.azurewebsites.net/getUserIdByUsername',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: receiverUsername,
+        }),
+      });
+      if (response.ok){
+        const result = await response.json();
+        setReceiveInfoForm({...receiveInfoForm, receiverId: result.userId})
+      }
+    }
+    catch (error){
+      Alert.alert(`${error.message}`);
+    }
+  }
+
   return (
     <View style = { styles.container}>
       <View style={{flex: 1}}>
         <Text style = { styles.title }>Receiver Details</Text>
+
+        <TextInput
+          style = { styles.input }
+          placeholder="Receiver Username"
+          value={receiverUsername}
+          onChangeText={setReceiverUsername}
+        />
 
         <TextInput
           style = { styles.input }

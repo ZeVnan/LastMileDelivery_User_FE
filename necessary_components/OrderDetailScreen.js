@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { UserContext } from './UserContext';
 
-const OrderDetailScreen = () => {
+const OrderDetailScreen = ({route}) => {
   const [trackingData, setTrackingData] = useState(null);
+  const {item} = route.params;
+  const {userRole} = useContext(UserContext);
 
   useEffect(() => {
     fetch('https://api.example.com/tracking/TY9860036NM')
@@ -32,16 +35,30 @@ const OrderDetailScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.trackingId}>Tracking ID:</Text>
-      <Text style={styles.title}>Iphone 15 Pro Max 128GB</Text>
-      <View style={styles.addressContainer}>
-        <Text style={styles.address}>Sender Address</Text>
-        <Text style={styles.address}>To</Text>
-        <Text style={styles.address}>Receiver Address</Text>
+      <Text style={styles.trackingId}>Tracking ID: {item._id}</Text>
+      <Text style={styles.title}>{item.packageSize}kg package</Text>
+      <View style={styles.infoContainer}>
+        <Text style={styles.from}>{item.senderInfo.name}</Text>
+        <Text style={styles.toLabel}>To</Text>
+        <Text style={styles.to}>{item.receiverInfo.name}</Text>
       </View>
-      <Text style={styles.status}>Status</Text>
+      <View style={styles.infoContainer}>
+        <Text style={styles.from}>{item.senderInfo.address}</Text>
+        <Text style={styles.toLabel}>To</Text>
+        <Text style={styles.to}>{item.receiverInfo.address}</Text>
+      </View>
+      <Text style={styles.info}>Shipment Type: {item.shipmentType}</Text>
+      <Text style={styles.info}>Delivery Type: {item.deliveryType}</Text>
+      {userRole === "sender" &&(
+        <View>
+          <Text style={styles.info}>Pick Up Date: {item.pickupDate}</Text>
+          <Text style={styles.info}>Pick Up Time: {item.pickupTime}</Text>
+          <Text style={styles.info}>Message: {item.message}</Text>
+        </View>
+      )}
+      <Text style={styles.status}>{item.status}</Text>
       <ScrollView>
-        <View style={styles.dayActivity}>
+        {/* <View style={styles.dayActivity}>
           <Text style={styles.dayActivityTitle}>
             30/6/2024
           </Text>
@@ -82,7 +99,7 @@ const OrderDetailScreen = () => {
               Processed at warehouse
             </Text>
           </View>
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
@@ -115,14 +132,28 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 10,
   },
-  address: {
+  from: {
     fontSize: 13,
+    width: '45%',
+    textAlign: 'left',
   },
-  addressContainer: {
+  to: {
+    fontSize: 13,
+    width: '45%',
+    textAlign: 'right',
+  },
+  toLabel: {
+    fontSize: 13,
+    width: '10%'
+  },
+  infoContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginHorizontal: 10,
     marginBottom: 20,
+  },
+  info: {
+    marginHorizontal: 10,
+    marginBottom: 10,
   },
   activity: {
     marginHorizontal: 20,

@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
+import { UserContext } from './UserContext';
 
 const CheckOutScreen = ({navigation, route}) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Master Card');
   const {sendInfo, receiveInfo} = route.params;
+  const { token } = useContext(UserContext);
   
+  useEffect(() => {
+    try{
 
+    }
+    catch(error){
+
+    }
+  }, [receiveInfo]);
   const handleCheckout = async () => {
     const hours = sendInfo.pickupTime.getHours().toString().padStart(2, '0');
     const minutes = sendInfo.pickupTime.getMinutes().toString().padStart(2, '0');
@@ -16,32 +25,34 @@ const CheckOutScreen = ({navigation, route}) => {
     const month = (sendInfo.pickupDate.getMonth() + 1).toString().padStart(2, '0');
     const day = sendInfo.pickupDate.getDate().toString().padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
-
     try{
-      const response = await fetch('https://waseminarcnpm.azurewebsites.net/order/confirmation', {
+      const response = await fetch('https://waseminarcnpm.azurewebsites.net/protected/confirmation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           shipmentType: sendInfo.shipmentType,
           deliveryType: sendInfo.deliveryType,
           packageSize: sendInfo.packageSize,
-          weight: 0,
+          weight: sendInfo.packageSize,
           pickupDate: formattedDate,
           pickupTime: formattedTime,
-          status: "",
-          value: 0,
+          status: "pending",
+          value: value,
           hudId: "",
-          deliveryAddress: "",
-          message: receiveInfo.message,
+          deliveryAddress: receiveInfo.receiverAddress,
+          message: receiveInfo.message === "" ? "-" : receiveInfo.message,
           inProgress: true,
-          sendInfo: {
+          senderInfo: {
+            userId: sendInfo.senderId,
             name: sendInfo.senderName,
             address: sendInfo.senderAddress,
             phoneNumber: sendInfo.senderMobileNumber,
           },
           receiverInfo: {
+            userId: receiveInfo.receiverId,
             name: receiveInfo.receiverName,
             address: receiveInfo.receiverAddress,
             phoneNumber: receiveInfo.receiverMobileNumber,
@@ -52,7 +63,8 @@ const CheckOutScreen = ({navigation, route}) => {
         navigation.navigate('Home');
       }
       else{
-        Alert.alert("Checkout failed");
+        const result = await response.json()
+        console.log(result.err);
       }
     }
     catch(error){
@@ -160,17 +172,7 @@ const CheckOutScreen = ({navigation, route}) => {
         </View>
       </ScrollView>
       <Button 
-        title="Pay Now" onPress={() => {const hours = sendInfo.pickupTime.getHours().toString().padStart(2, '0');
-          const minutes = sendInfo.pickupTime.getMinutes().toString().padStart(2, '0');
-          const formattedTime = `${hours}:${minutes}`;
-          
-          const year = sendInfo.pickupDate.getFullYear();
-          const month = (sendInfo.pickupDate.getMonth() + 1).toString().padStart(2, '0');
-          const day = sendInfo.pickupDate.getDate().toString().padStart(2, '0');
-          const formattedDate = `${year}-${month}-${day}`;
-      
-          Alert.alert(`${formattedDate}`, `${formattedTime}`)
-          return;}} 
+        title="Pay Now" onPress={handleCheckout} 
         buttonStyle={styles.confirmButton}/>
     </View>
   );

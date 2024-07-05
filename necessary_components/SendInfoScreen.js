@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Button } from 'react-native-elements';
 import axios from 'axios';
+import { UserContext } from './UserContext';
 
 const SendInfoScreen = ({navigation}) => {
+  const { userId } = useContext(UserContext);
   const [sendInfoForm, setSendInfoForm] = useState({
     shipmentType: "",
     deliveryType: "",
+    senderId: userId,
     senderName: "",
     senderMobileNumber: "",
     senderAddress: "",

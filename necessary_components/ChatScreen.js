@@ -1,24 +1,18 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, Button, StyleSheet, Text } from 'react-native';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
+import { View, Button, StyleSheet, Alert } from 'react-native';
 import { GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import * as ImagePicker from 'expo-image-picker';
-import * as Permissions from 'expo-permissions';
+import axios from 'axios';
+import { UserContext } from './UserContext';
+
 
 const ChatScreen = ({navigation}) => {
     const [messages, setMessages] = useState([]);
+    const [messageId, setMessageId] = useState(0);
+    const { token } = useContext(UserContext);
 
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello! How can I help you?',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'ChatGPT',
-        },
-      },
-    ]);
+    createMessage(2, "Bot", "Hello, I help you with the packing.")
   }, []);
 
   const onSend = useCallback((messages = []) => {
@@ -26,6 +20,35 @@ const ChatScreen = ({navigation}) => {
       GiftedChat.append(previousMessages, messages)
     );
   }, []);
+
+  const createMessage = (ownerId, ownerName, text) => {
+    const message = {
+      _id: messageId,
+      createdAt: new Date(),
+      user: {
+        _id: ownerId,
+        name: ownerName,
+      },
+      text: text
+    }
+    const currentId = messageId + 1;
+    setMessageId(currentId);
+    onSend([message]);
+  }
+  const createImageMessage = (ownerId, ownerName, imageUri) => {
+    const message = {
+      _id: messageId,
+      createdAt: new Date(),
+      user: {
+        _id: ownerId,
+        name: ownerName,
+      },
+      image: imageUri
+    }
+    const currentId = messageId + 1;
+    setMessageId(currentId);
+    onSend([message]);
+  }
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -42,16 +65,27 @@ const ChatScreen = ({navigation}) => {
     });
 
     if (!result.canceled) {
-      const imageMessage = {
-        _id: Math.random().toString(36).substring(7),
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'You',
-        },
-        image: result.assets[0].uri,
-      };
-      onSend([imageMessage]);
+      createImageMessage(1, "You", result.assets[0].uri);
+      const imageUrl = await uploadImageToImgbb(result.assets[0].uri);
+      if (imageUrl !== null){
+        const classifyString = await classifyImage(imageUrl);
+        if (classifyString !== null){
+          createMessage(2, "Bot", `Your good maybe: ${classifyString}`);
+          const recommendation = await recommendByImage(classifyString);
+          if (recommendation !== null){
+            createMessage(2, "Bot", recommendation);
+          }
+          else{
+            Alert.alert("Error", "Cannot generate recommendation");
+          }
+        }
+        else{
+          Alert.alert("Error", "Cannot classify image");
+        }
+      }
+      else{
+        Alert.alert("Error", "Cannot upload image");
+      }
     }
   };
 
@@ -63,20 +97,93 @@ const ChatScreen = ({navigation}) => {
     });
 
     if (!result.canceled) {
-      const imageMessage = {
-        _id: Math.random().toString(36).substring(7),
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'You',
-        },
-        image: result.assets[0].uri,
-      };
-      onSend([imageMessage]);
+      createImageMessage(1, "You", result.assets[0].uri);
+      const imageUrl = await uploadImageToImgbb(result.assets[0].uri);
+      if (imageUrl !== null){
+        const classifyString = await classifyImage(imageUrl);
+        if (classifyString !== null){
+          createMessage(2, "Bot", `Your good maybe: ${classifyString}`);
+          const recommendation = await recommendByImage(classifyString);
+          if (recommendation !== null){
+            createMessage(2, "Bot", recommendation);
+          }
+          else{
+            Alert.alert("Error", "Cannot generate recommendation");
+          }
+        }
+        else{
+          Alert.alert("Error", "Cannot classify image");
+        }
+      }
+      else{
+        Alert.alert("Error", "Cannot upload image");
+      }
     }
   };    
-  
-  
+  const uploadImageToImgbb = async (uri) => {
+    const apiKey = '40b2cc4cf8bd13d2053771fd619ffde2';
+    const data = new FormData();
+    data.append('image', {
+      uri,
+      type: 'image/jpeg',
+      name: 'photo.jpg',
+    });
+
+    try {
+      const response = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${apiKey}`,
+        data
+      );
+      return response.data.data.url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
+  };
+
+  const classifyImage = async(imageUrl) => {
+    const body = {
+      image_url: imageUrl
+    }
+    try{
+      const response = await axios.post('https://waseminarcnpm.azurewebsites.net/protected/classify-image',
+        body,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data.predicted_class;
+    }
+    catch(error) {
+      console.error('Error classifying image:', error);
+      return null;
+    }
+  }
+  const recommendByImage = async(classifyString) => {
+    const body= {
+      category: classifyString,
+    }
+    try{
+      const response = await axios.post('https://waseminarcnpm.azurewebsites.net/protected/recommendation',
+        body,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data.response;
+    }
+    catch(error) {
+      console.error('Error classifying image:', error);
+      return null;
+    }
+  }
+
     return (
       <View style={styles.container}>
         <GiftedChat

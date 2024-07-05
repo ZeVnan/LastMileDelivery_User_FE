@@ -12,6 +12,8 @@ import OrderDetailScreen from './necessary_components/OrderDetailScreen';
 import ProfileScreen from './necessary_components/ProfileScreen';
 import LoginScreen from './necessary_components/LoginScreen';
 import ReviewScreen from './necessary_components/ReviewScreen'
+import { UserProvider } from './necessary_components/UserContext';
+
 import { useState } from 'react';
 
 const Stack = createNativeStackNavigator();
@@ -26,29 +28,33 @@ export default function App() {
   }
   if (!isLoggedIn){
     return (
-      <SafeAreaView style={styles.container}>
-        <LoginScreen onLogin={handleLogin}/>
-      </SafeAreaView>
+      <UserProvider>
+        <SafeAreaView style={styles.container}>
+          <LoginScreen onLogin={handleLogin}/>
+        </SafeAreaView>
+      </UserProvider>
     )
   }
   return (
-    <SafeAreaView style={styles.container}>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen}/>
-          <Stack.Screen name="Chat" component={ChatScreen}/>
-          <Stack.Screen name="Send Confirmation" component={SendInfoScreen}/>
-          <Stack.Screen name="Receive Confirmation" component={ReceiveInfoScreen}/>
-          <Stack.Screen name="CheckOut" component={CheckOutScreen}/>
-          <Stack.Screen name="Order History" component={OrderHisToryScreen}/>
-          <Stack.Screen name="Order Detail" component={OrderDetailScreen}/>
-          <Stack.Screen name="Profile">
-            {props => <ProfileScreen {...props} onLogout={handleLogout}/>}
-          </Stack.Screen>
-          <Stack.Screen name="Review" component={ReviewScreen}/>
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaView>
+    <UserProvider>
+      <SafeAreaView style={styles.container}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Home">
+            <Stack.Screen name="Home" component={HomeScreen}/>
+            <Stack.Screen name="Chat" component={ChatScreen}/>
+            <Stack.Screen name="Send Confirmation" component={SendInfoScreen}/>
+            <Stack.Screen name="Receive Confirmation" component={ReceiveInfoScreen}/>
+            <Stack.Screen name="CheckOut" component={CheckOutScreen}/>
+            <Stack.Screen name="Order History" component={OrderHisToryScreen}/>
+            <Stack.Screen name="Order Detail" component={OrderDetailScreen}/>
+            <Stack.Screen name="Profile">
+              {props => <ProfileScreen {...props} onLogout={handleLogout}/>}
+            </Stack.Screen>
+            <Stack.Screen name="Review" component={ReviewScreen}/>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaView>
+    </UserProvider>
   );
 }
 
