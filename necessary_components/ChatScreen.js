@@ -119,7 +119,27 @@ const ChatScreen = ({navigation}) => {
         Alert.alert("Error", "Cannot upload image");
       }
     }
-  };    
+  };
+  const sendMessage = async(messages) => {
+    const body = {
+      
+    }
+    try{
+      const response = await axios.post(`http://pythonserver:27018/protected/chat?prompt=${messages[0]}`,
+        body,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      createMessage(2, "Bot", response.status)
+    }
+    catch(error){
+      console.log(error.message);
+    }
+  }
   const uploadImageToImgbb = async (uri) => {
     const apiKey = '40b2cc4cf8bd13d2053771fd619ffde2';
     const data = new FormData();
@@ -188,7 +208,10 @@ const ChatScreen = ({navigation}) => {
       <View style={styles.container}>
         <GiftedChat
           messages={messages}
-          onSend={(messages) => onSend(messages)}
+          onSend={(messages) => {
+            onSend(messages);
+            //sendMessage(messages);
+          }}
           user={{
             _id: 1,
           }}
