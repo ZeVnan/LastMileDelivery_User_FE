@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
-import { UserContext } from './UserContext';
+import { UserContext } from '../Utilities/UserContext';
+import { InfoCard } from '../CommonComponents/InfoCard';
 
 const CheckOutScreen = ({navigation, route}) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Master Card');
-  const {sendInfo, receiveInfo} = route.params;
+  const {senderInfo, receiverInfo, deliveryInfo} = route.params;
   const { token } = useContext(UserContext);
   
   useEffect(() => {
@@ -15,47 +16,47 @@ const CheckOutScreen = ({navigation, route}) => {
     catch(error){
 
     }
-  }, [receiveInfo]);
+  }, [receiverInfo]);
   const handleCheckout = async () => {
-    const hours = sendInfo.pickupTime.getHours().toString().padStart(2, '0');
-    const minutes = sendInfo.pickupTime.getMinutes().toString().padStart(2, '0');
+    const hours = deliveryInfo.pickupTime.getHours().toString().padStart(2, '0');
+    const minutes = deliveryInfo.pickupTime.getMinutes().toString().padStart(2, '0');
     const formattedTime = `${hours}:${minutes}`;
     
-    const year = sendInfo.pickupDate.getFullYear();
-    const month = (sendInfo.pickupDate.getMonth() + 1).toString().padStart(2, '0');
-    const day = sendInfo.pickupDate.getDate().toString().padStart(2, '0');
+    const year = deliveryInfo.pickupDate.getFullYear();
+    const month = (deliveryInfo.pickupDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = deliveryInfo.pickupDate.getDate().toString().padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
     try{
-      const response = await fetch('https://waseminarcnpm.azurewebsites.net/protected/confirmation', {
+      const response = await fetch('https://waseminarcnpm2.azurewebsites.net/protected/confirmation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          shipmentType: sendInfo.shipmentType,
-          deliveryType: sendInfo.deliveryType,
-          packageSize: sendInfo.packageSize,
-          weight: sendInfo.packageSize,
+          shipmentType: deliveryInfo.shipmentType,
+          deliveryType: deliveryInfo.deliveryType,
+          packageSize: deliveryInfo.packageSize,
+          weight: deliveryInfo.packageSize,
           pickupDate: formattedDate,
           pickupTime: formattedTime,
           status: "pending",
           value: value,
           hudId: "",
-          deliveryAddress: receiveInfo.receiverAddress,
-          message: receiveInfo.message === "" ? "-" : receiveInfo.message,
+          deliveryAddress: receiverInfo.receiverAddress,
+          message: receiverInfo.message === "" ? "-" : receiverInfo.message,
           inProgress: true,
           senderInfo: {
-            userId: sendInfo.senderId,
-            name: sendInfo.senderName,
-            address: sendInfo.senderAddress,
-            phoneNumber: sendInfo.senderMobileNumber,
+            userId: senderInfo.senderId,
+            name: senderInfo.senderName,
+            address: senderInfo.senderAddress,
+            phoneNumber: senderInfo.senderMobileNumber,
           },
           receiverInfo: {
-            userId: receiveInfo.receiverId,
-            name: receiveInfo.receiverName,
-            address: receiveInfo.receiverAddress,
-            phoneNumber: receiveInfo.receiverMobileNumber,
+            userId: receiverInfo.receiverId,
+            name: receiverInfo.receiverName,
+            address: receiverInfo.receiverAddress,
+            phoneNumber: receiverInfo.receiverMobileNumber,
           }
         }),
       });
@@ -73,16 +74,16 @@ const CheckOutScreen = ({navigation, route}) => {
   };
   const shippingFees = {
     Document: 1.00,
-    Package: 5.00 * sendInfo.packageSize * 0.1,
-    Parcel: 2.50 * sendInfo.packageSize * 0.1,
+    Package: 5.00 * deliveryInfo.packageSize * 0.1,
+    Parcel: 2.50 * deliveryInfo.packageSize * 0.1,
   }
   const deliveryFees = {
     Standard: 0.75,
     Express: 3.00,
     SameDay: 8.00,
   }
-  const shippingFee = shippingFees[sendInfo.shipmentType] || 0;
-  const deliveryFee = deliveryFees[sendInfo.deliveryType] || 0;
+  const shippingFee = shippingFees[deliveryInfo.shipmentType] || 0;
+  const deliveryFee = deliveryFees[deliveryInfo.deliveryType] || 0;
   const discount = 2.00;
   const value = 10.00;
   const total = value + shippingFee + deliveryFee - discount;
@@ -93,31 +94,17 @@ const CheckOutScreen = ({navigation, route}) => {
         <View style={styles.itemContainer}>
           <Text style={styles.itemTitle}>Your Order</Text>
 
-          <Text style={ styles.orderInfo}>
-            From:
-          </Text>
-          <Text style={ styles.orderName}>
-            {sendInfo.senderName}
-          </Text>
-          <Text style={ styles.orderAddress}>
-            {sendInfo.senderAddress}
-          </Text>
-          <Text style={ styles.orderPhoneNumber}>
-            {sendInfo.senderMobileNumber}
-          </Text>
-
-          <Text style={ styles.orderInfo}>
-            To:
-          </Text>
-          <Text style={ styles.orderName}>
-            {receiveInfo.receiverName}
-          </Text>
-          <Text style={ styles.orderAddress}>
-            {receiveInfo.receiverAddress}
-          </Text>
-          <Text style={ styles.orderPhoneNumber}>
-            {receiveInfo.receiverMobileNumber}
-          </Text>
+          <InfoCard
+            name={senderInfo.senderName}
+            address={senderInfo.senderAddress}
+            phoneNumber={senderInfo.senderMobileNumber}
+            from={true}/>
+          <InfoCard
+            name={receiverInfo.receiverName}
+            address={receiverInfo.receiverAddress}
+            phoneNumber={receiverInfo.receiverMobileNumber}
+            from={false}/>
+          
 
         </View>
 

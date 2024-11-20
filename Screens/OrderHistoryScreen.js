@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
-import { UserContext } from './UserContext';
+import { UserContext } from '../Utilities/UserContext';
 
 const OrderHistoryScreen = ({navigation}) => {
   const [pendingOrders, setPendingOrders] = useState([]);
@@ -28,7 +28,7 @@ const OrderHistoryScreen = ({navigation}) => {
 
   const getOrder = async(userId, status) => {
     try{
-      const response = await fetch('https://waseminarcnpm.azurewebsites.net/getOrderByUserIdAndStatus', {
+      const response = await fetch('https://waseminarcnpm2.azurewebsites.net/getOrderByUserIdAndStatus', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
