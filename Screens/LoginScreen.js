@@ -1,12 +1,19 @@
 import React, { useState, useContext } from 'react';
 import { View, TextInput, StyleSheet, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
-import { UserContext } from './UserContext';
+import { UserContext } from '../Utilities/UserContext';
+import { stylesInput } from '../CommonComponents/Input'
+import { Button2 } from '../CommonComponents/Button'
 
 const LoginScreen = ({onLogin}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const {setUserId, setUserRole, userRole, setToken} = useContext(UserContext);
+
+  const togglePasswordVisibility = () =>{
+    setIsPasswordHidden(!isPasswordHidden);
+  }
 
   const handleLogin = async () => {
     if (username === "1" && password ==="1"){
@@ -16,7 +23,7 @@ const LoginScreen = ({onLogin}) => {
       return;
     }
     try{
-      const response = await fetch('https://waseminarcnpm.azurewebsites.net/auth/sign-in',{
+      const response = await fetch('https://waseminarcnpm2.azurewebsites.net/auth/sign-in',{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,22 +56,32 @@ const LoginScreen = ({onLogin}) => {
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[stylesInput.textInput0]}
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry={true}
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.inputPassword]}
+            placeholder="Password"
+            secureTextEntry={isPasswordHidden}
+            value={password}
+            onChangeText={setPassword}/>
+          <Button
+            icon={{
+                name: isPasswordHidden ? 'visibility-off' : 'visibility',
+                type: 'material',
+                size: 25,
+                color: '#808080',
+            }}
+            buttonStyle={styles.visibilityButton}
+            onPress={togglePasswordVisibility}/>
+        </View>
       </View>
-      <Button
+      <Button2
         title="Login" 
-        onPress={handleLogin}
+        onPressEvent={handleLogin}
       />
     </View>
   );
@@ -73,19 +90,32 @@ const LoginScreen = ({onLogin}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     padding: 20,
   },
   inputContainer: {
     flex: 1,
-    justifyContent:'center',
+    justifyContent: 'center',
   },
-  input: {
-    height: 40,
-    backgroundColor: '#f2f2f2',
-    padding: 10,
-    marginBottom: 10,
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: 'center',
   },
+  inputPassword: {
+    flex: 1,
+    height: 50,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    marginVertical: 10,
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
+  visibilityButton: {
+    width: 50,
+    height: 50,
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+    backgroundColor: '#ffffff'
+  }
 });
 
 export default LoginScreen

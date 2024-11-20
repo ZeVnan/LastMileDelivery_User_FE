@@ -1,18 +1,18 @@
-import { Text, SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import HomeScreen from './necessary_components/HomeScreen';
-import ChatScreen from './necessary_components/ChatScreen';
-import SendInfoScreen from './necessary_components/SendInfoScreen';
-import ReceiveInfoScreen from './necessary_components/ReceiveInfoScreen';
-import CheckOutScreen from './necessary_components/CheckOutScreen';
-import OrderHisToryScreen from './necessary_components/OrderHistoryScreen';
-import OrderDetailScreen from './necessary_components/OrderDetailScreen';
-import ProfileScreen from './necessary_components/ProfileScreen';
-import LoginScreen from './necessary_components/LoginScreen';
-import ReviewScreen from './necessary_components/ReviewScreen'
-import { UserProvider } from './necessary_components/UserContext';
+import HomeScreen from './Screens/HomeScreen';
+import ChatScreen from './Screens/ChatScreen';
+import SenderInfoScreen from './Screens/SenderInfoScreen';
+import ReceiverInfoScreen from './Screens/ReceiverInfoScreen';
+import DeliveryInfoScreen from './Screens/DeliveryInfoScreen';
+import CheckOutScreen from './Screens/CheckOutScreen';
+import OrderHisToryScreen from './Screens/OrderHistoryScreen';
+import OrderDetailScreen from './Screens/OrderDetailScreen';
+import ProfileScreen from './Screens/ProfileScreen';
+import LoginScreen from './Screens/LoginScreen';
+import { UserProvider } from './Utilities/UserContext';
 
 import { useState } from 'react';
 
@@ -42,8 +42,9 @@ export default function App() {
           <Stack.Navigator initialRouteName="Home">
             <Stack.Screen name="Home" component={HomeScreen}/>
             <Stack.Screen name="Chat" component={ChatScreen}/>
-            <Stack.Screen name="Send Confirmation" component={SendInfoScreen}/>
-            <Stack.Screen name="Receive Confirmation" component={ReceiveInfoScreen}/>
+            <Stack.Screen name="Sender Infomation" component={SenderInfoScreen}/>
+            <Stack.Screen name="Receiver Information" component={ReceiverInfoScreen}/>
+            <Stack.Screen name="Delivery Information" component={DeliveryInfoScreen}/>
             <Stack.Screen name="CheckOut" component={CheckOutScreen}/>
             <Stack.Screen name="Order History" component={OrderHisToryScreen}/>
             <Stack.Screen name="Order Detail" component={OrderDetailScreen}/>

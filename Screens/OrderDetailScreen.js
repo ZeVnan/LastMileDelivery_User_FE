@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { UserContext } from './UserContext';
+import { UserContext } from '../Utilities/UserContext';
 
 const OrderDetailScreen = ({route}) => {
   const [trackingData, setTrackingData] = useState(null);
