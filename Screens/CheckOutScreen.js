@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 import { UserContext } from '../Utilities/UserContext';
-import { InfoCard } from '../CommonComponents/InfoCard';
+import { InfoCard } from '../CommonComponents/Card';
 import { Button2 } from '../CommonComponents/Button';
 
 const CheckOutScreen = ({navigation, route}) => {
