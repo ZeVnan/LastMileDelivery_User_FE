@@ -70,8 +70,8 @@ const ReceiverInfoScreen = ({navigation, route}) => {
       Alert.alert(`${error.message}`);
     }
   }
-  const handleReceiverInfo = () => {
-    getUserId();
+  const handleReceiverInfo = async() => {
+    await getUserId();
     if (receiverInfoForm.receiverId === ""){
       Alert.alert("Missing data", "Receiver username is missing or not found");
       return;

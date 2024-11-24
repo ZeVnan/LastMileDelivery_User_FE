@@ -3,20 +3,13 @@ import { View, Text, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 import { UserContext } from '../Utilities/UserContext';
 import { InfoCard } from '../CommonComponents/InfoCard';
+import { Button2 } from '../CommonComponents/Button';
 
 const CheckOutScreen = ({navigation, route}) => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Master Card');
   const {senderInfo, receiverInfo, deliveryInfo} = route.params;
   const { token } = useContext(UserContext);
   
-  useEffect(() => {
-    try{
-
-    }
-    catch(error){
-
-    }
-  }, [receiverInfo]);
   const handleCheckout = async () => {
     const hours = deliveryInfo.pickupTime.getHours().toString().padStart(2, '0');
     const minutes = deliveryInfo.pickupTime.getMinutes().toString().padStart(2, '0');
@@ -34,18 +27,6 @@ const CheckOutScreen = ({navigation, route}) => {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          shipmentType: deliveryInfo.shipmentType,
-          deliveryType: deliveryInfo.deliveryType,
-          packageSize: deliveryInfo.packageSize,
-          weight: deliveryInfo.packageSize,
-          pickupDate: formattedDate,
-          pickupTime: formattedTime,
-          status: "pending",
-          value: value,
-          hudId: "",
-          deliveryAddress: receiverInfo.receiverAddress,
-          message: receiverInfo.message === "" ? "-" : receiverInfo.message,
-          inProgress: true,
           senderInfo: {
             userId: senderInfo.senderId,
             name: senderInfo.senderName,
@@ -57,7 +38,18 @@ const CheckOutScreen = ({navigation, route}) => {
             name: receiverInfo.receiverName,
             address: receiverInfo.receiverAddress,
             phoneNumber: receiverInfo.receiverMobileNumber,
-          }
+          },
+          deliveryInfo: {
+            shipmentType: deliveryInfo.shipmentType,
+            deliveryType: deliveryInfo.deliveryType,
+            status: "pending",
+            packageSize: deliveryInfo.packageSize,
+            pickupDate: formattedDate,
+            pickupTime: formattedTime,
+            value: value,
+          },
+          hudId: "",
+          message: receiverInfo.message === "" ? "-" : receiverInfo.message,
         }),
       });
       if (response.ok){
@@ -93,7 +85,6 @@ const CheckOutScreen = ({navigation, route}) => {
       <ScrollView>
         <View style={styles.itemContainer}>
           <Text style={styles.itemTitle}>Your Order</Text>
-
           <InfoCard
             name={senderInfo.senderName}
             address={senderInfo.senderAddress}
@@ -104,13 +95,29 @@ const CheckOutScreen = ({navigation, route}) => {
             address={receiverInfo.receiverAddress}
             phoneNumber={receiverInfo.receiverMobileNumber}
             from={false}/>
-          
-
         </View>
-
+        <View style={styles.itemContainer}>
+          <Text style={styles.itemTitle}>Summary</Text>
+          <View style={styles.orderSummaryRow}>
+            <Text style={styles.orderSummaryLabel}>Value</Text>
+            <Text style={styles.orderSummaryValue}>${value}</Text>
+          </View>
+          <View style={styles.orderSummaryRow}>
+            <Text style={styles.orderSummaryLabel}>Transport Fee</Text>
+            <Text style={styles.orderSummaryValue}>${shippingFee + deliveryFee}</Text>
+          </View>
+          <View style={styles.orderSummaryRow}>
+            <Text style={styles.orderSummaryLabel}>Discount</Text>
+            <Text style={styles.orderSummaryValue}>-${discount}</Text>
+          </View>
+          <View style={styles.orderSummaryRow}>
+            <Text style={styles.orderSummaryLabel}>Total</Text>
+            <Text style={[styles.orderSummaryValue, {fontWeight: 'bold'}]}>${total}</Text>
+          </View>
+        </View>
         <View style={styles.itemContainer}>
           <Text style={styles.itemTitle}>Select Payment Method</Text>
-          <View style={styles.paymentMethodOptions}>
+          <ScrollView contentContainerStyle={styles.paymentMethodOptions}>
             <Button
               title="Master Card"
               onPress={() => setSelectedPaymentMethod('Master Card')}
@@ -135,32 +142,12 @@ const CheckOutScreen = ({navigation, route}) => {
                   : styles.paymentMethodButton
               }
             />
-          </View>
-        </View>
-
-        <View style={styles.itemContainer}>
-          <Text style={styles.itemTitle}>Summary</Text>
-          <View style={styles.orderSummaryRow}>
-            <Text style={styles.orderSummaryLabel}>Value</Text>
-            <Text style={styles.orderSummaryValue}>${value}</Text>
-          </View>
-          <View style={styles.orderSummaryRow}>
-            <Text style={styles.orderSummaryLabel}>Transport Fee</Text>
-            <Text style={styles.orderSummaryValue}>${shippingFee + deliveryFee}</Text>
-          </View>
-          <View style={styles.orderSummaryRow}>
-            <Text style={styles.orderSummaryLabel}>Discount</Text>
-            <Text style={styles.orderSummaryValue}>-${discount}</Text>
-          </View>
-          <View style={styles.orderSummaryRow}>
-            <Text style={styles.orderSummaryLabel}>Total</Text>
-            <Text style={styles.orderSummaryValue}>${total}</Text>
-          </View>
+          </ScrollView>
         </View>
       </ScrollView>
-      <Button 
-        title="Pay Now" onPress={handleCheckout} 
-        buttonStyle={styles.confirmButton}/>
+      <Button2 
+        title="Pay Now" 
+        onPressEvent={async() => {await handleCheckout}} />
     </View>
   );
 };
@@ -176,30 +163,10 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  orderInfo: {
-    fontSize: 16,
-    marginHorizontal: 20,
-    marginBottom: 5,
-  },
-  orderName: {
-    fontSize: 13,
-    marginHorizontal: 30,
-    marginBottom: 5,
-  },
-  orderAddress: {
-    fontSize: 13,
-    marginHorizontal: 40,
-    marginBottom: 5,
-  },
-  orderPhoneNumber: {
-    fontSize: 13,
-    marginHorizontal: 40,
-    marginBottom: 5,
+    paddingVertical: 10,
   },
   paymentMethodOptions: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     marginHorizontal: 20,
     marginBottom: 20,
   },
@@ -211,23 +178,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#e6e6e6',
   },
   addCardButton: {
-    marginHorizontal: 20,
+    
   },
   orderSummaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
-    marginHorizontal: 20,
+    paddingVertical: 5,
   },
   orderSummaryLabel: {
-    fontSize: 16,
+    fontSize: 12,
   },
   orderSummaryValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  confirmButton:{
-    
+    fontSize: 12,
   },
 });
 

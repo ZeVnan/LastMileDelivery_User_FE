@@ -39,7 +39,7 @@ const LoginScreen = ({onLogin}) => {
         setUserId(result.data.id);
         setUserRole(result.data.role);
         setToken(result.data.token);
-        if (userRole === "sender" || userRole === "receiver"){
+        if (userRole === "client"){
           onLogin();
         }
       }
@@ -81,7 +81,7 @@ const LoginScreen = ({onLogin}) => {
       </View>
       <Button2
         title="Login" 
-        onPressEvent={handleLogin}
+        onPressEvent={async() => {await handleLogin()}}
       />
     </View>
   );
