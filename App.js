@@ -51,7 +51,6 @@ export default function App() {
             <Stack.Screen name="Profile">
               {props => <ProfileScreen {...props} onLogout={handleLogout}/>}
             </Stack.Screen>
-            <Stack.Screen name="Review" component={ReviewScreen}/>
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
