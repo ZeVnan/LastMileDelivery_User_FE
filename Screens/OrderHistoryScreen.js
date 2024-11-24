@@ -1,30 +1,21 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-elements';
 import { UserContext } from '../Utilities/UserContext';
+import { OrderCard } from '../CommonComponents/Card';
 
 const OrderHistoryScreen = ({navigation}) => {
-  const [pendingOrders, setPendingOrders] = useState([]);
-  const [completedOrders, setCompletedOrders] = useState([]);
-  const [selectedTab, setSelectedTab] = useState("pending");
+  const [sendOrders, setSendOrders] = useState([]);
+  const [receiveOrders, setReceiveOrder] = useState([]);
+  const [selectedTab, setSelectedTab] = useState("send");
   const { userId } = useContext(UserContext);
 
   const handleTabChange = (newTab) => {
     setSelectedTab(newTab);
   };
 
-  useEffect(() => {
-    getOrder(userId, "pending")
-  }, []);
-  useEffect(() =>{
-    getOrder(userId, "completed")
-  }, [])
-
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/todos')
-      .then(response => response.json())
-      .then(json => setCompletedOrders(json));
-  }, []);
+  // useEffect(getOrder(userId, "send"), []);
+  // useEffect(getOrder(userId, "receive"), []);
 
   const getOrder = async(userId, status) => {
     try{
@@ -37,19 +28,19 @@ const OrderHistoryScreen = ({navigation}) => {
       });
       if (response.ok){
         const result = await response.json();
-        if (status === "pending"){
-          setPendingOrders(result.orders)
+        if (status === "send"){
+          setSendOrders(result.orders)
         }
-        else if (status === "completed"){
-          setCompletedOrders(result.orders)
+        else if (status === "receive"){
+          setReceiveOrder(result.orders)
         }
       }
       else{
-        if (status === "pending"){
-          Alert.alert("Error", "Cannot load pending orders")
+        if (status === "send"){
+          Alert.alert("Error", "Cannot load send orders")
         }
-        else if (status === "completed"){
-          Alert.alert("Error", "Cannot load completed orders")
+        else if (status === "receive"){
+          Alert.alert("Error", "Cannot load receive orders")
         }
       }
     }
@@ -57,66 +48,82 @@ const OrderHistoryScreen = ({navigation}) => {
       Alert.alert("Error", "Something went wrong")
     }
   }
+  const fakeSendOrders = [
+    {
+      _id: '0',
+      senderName: 'Crimson Typhoon',
+      receiverName: 'Striker Eureka',
+      value: '10',
+      status: 'Pending',
+    },
+    {
+      _id: '1',
+      senderName: 'Crimson Typhoon',
+      receiverName: 'Vulcan Specter',
+      value: '20',
+      status: 'Completed',
+    },
+  ];
+  const fakeReceiveOrders = [
+    {
+      _id: '0',
+      senderName: 'Gipsy Danger',
+      receiverName: 'Cherno Alpha',
+      value: '10',
+      status: 'Completed',
+    },
+    {
+      _id: '1',
+      senderName: 'Saber Athena',
+      receiverName: 'Titan Redeemer',
+      value: '20',
+      status: 'In progress',
+    },
+  ];
 
-  const renderItem = ({ item, isCompleted }) => (
-    <View style={styles.order}>
-      <Text style={styles.trackingId}>Tracking ID: {item._id}</Text>
-      <Text style={styles.title}>{item.packageSize}kg package</Text>
-      <View style={styles.addressContainer}>
-        <Text style={styles.address}>{item.senderInfo.address}</Text>
-        <Text style={styles.address}>To</Text>
-        <Text style={styles.address}>{item.receiverInfo.address}</Text>
-      </View>
-      <View style={styles.statusContainer}>
-        <Text style={styles.status}>{item.status}</Text>
-        <Button 
-          title="View Details" 
-          onPress={() => navigation.navigate('Order Detail',{item: item })}
-          type='clear'  
-          titleStyle={{ fontSize: 13 }}
-        />
-      </View>
-      {isCompleted &&
-        <View style={styles.reviewContainer}>
-          <Button 
-            title="Review" 
-            onPress={() => navigation.navigate('Review')}
-            type='clear'  
-            titleStyle={{ fontSize: 13 }}
-          />
-        </View>}
-    </View>
+  const renderItem = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.order}
+      onPress={() => {}}>
+      <OrderCard
+        id = {item._id}
+        senderName={item.senderName}
+        receiverName={item.receiverName}
+        value={item.value}
+        status={item.status}/>
+    </TouchableOpacity>
   );
-
-  const renderPendingItem = ({ item }) => renderItem({ item, isCompleted: false });
-  const renderCompletedItem = ({ item }) => renderItem({ item, isCompleted: true });
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabs}>
-        <Button
-          title="Pending"
-          onPress={() => handleTabChange('pending')}
-          buttonStyle={[selectedTab === 'pending' ? styles.activeTab : styles.tab]}
-        />
-        <Button
-          title="Completed"
-          onPress={() => handleTabChange('completed')}
-          buttonStyle={[selectedTab === 'completed' ? styles.activeTab : styles.tab]}
-        />
+      <View style={styles.tabsContainer}>
+        <View style={styles.tabContainer}>
+          <Button
+            title="Send"
+            onPress={() => handleTabChange('send')}
+            buttonStyle={[styles.tabLeft, selectedTab === 'send' ? styles.activeTab : styles.inactiveTab]}
+          />
+        </View>
+        <View style={styles.tabContainer}>
+          <Button
+            title="Receive"
+            onPress={() => handleTabChange('receive')}
+            buttonStyle={[styles.tabRight, selectedTab === 'receive' ? styles.activeTab : styles.inactiveTab]}
+          />
+        </View>
+        
       </View>
-
-      {selectedTab === 'pending' && (
+      {selectedTab === 'send' && (
         <FlatList
-          data={pendingOrders}
-          renderItem={renderPendingItem}
+          data={fakeSendOrders}
+          renderItem={renderItem}
           keyExtractor={item => item._id}
         />
       )}
-      {selectedTab === 'completed' && (
+      {selectedTab === 'receive' && (
         <FlatList
-          data={completedOrders}
-          renderItem={renderCompletedItem}
+          data={fakeReceiveOrders}
+          renderItem={renderItem}
           keyExtractor={item => item._id}
         />
       )}
@@ -129,58 +136,32 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  tabs: {
+  tabsContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginHorizontal: 20,
+    marginVertical: 20,
+    width: '90%',
+    alignSelf: 'center',
   },
-  tab: {
-    backgroundColor: '#A9A9A9',
+  tabContainer: {
+    width: '50%',
+  },
+  tabLeft: {
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
+  tabRight: {
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  inactiveTab: {
+    backgroundColor: '#c0c0c0'
   },
   activeTab: {
 
   },
   order: {
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#eee',
-  },
-  trackingId: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  status: {
-    fontSize: 13,
-    color: '#77C795',
-    alignSelf: 'center',
-  },
-  address: {
-    fontSize: 13,
-  },
-  addressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  statusContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  reviewContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginHorizontal: 10,
-    marginBottom: 10,
+    width: '100%',
+    marginVertical: 10,
   },
 });
 
