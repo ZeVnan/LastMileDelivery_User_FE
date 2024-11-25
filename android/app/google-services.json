@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "667244808966",
+    "project_id": "lift-fc3ac",
+    "storage_bucket": "lift-fc3ac.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667244808966:android:ecef5522bf115e42c2ac87",
+        "android_client_info": {
+          "package_name": "com.bcluc.snacka74203e5a36f4673904ad7cd3f347298"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpFrRhBc8e65W9s-mWXq7DmLianoCHIMY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
