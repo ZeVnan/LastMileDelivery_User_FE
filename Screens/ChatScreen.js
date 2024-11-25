@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useEffect, useContext } from 'react';
-import { View, Button, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
+import { Button } from 'react-native-elements'
 import { GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
-import { UserContext } from './UserContext';
+import { UserContext } from '../Utilities/UserContext';
+import { Button1 } from '../CommonComponents/Button';
 
 
 const ChatScreen = ({navigation}) => {
@@ -166,7 +168,7 @@ const ChatScreen = ({navigation}) => {
       image_url: imageUrl
     }
     try{
-      const response = await axios.post('https://waseminarcnpm.azurewebsites.net/protected/classify-image',
+      const response = await axios.post('https://waseminarcnpm2.azurewebsites.net/protected/classify-image',
         body,
         {
           headers: {
@@ -187,7 +189,7 @@ const ChatScreen = ({navigation}) => {
       category: classifyString,
     }
     try{
-      const response = await axios.post('https://waseminarcnpm.azurewebsites.net/protected/recommendation',
+      const response = await axios.post('https://waseminarcnpm2.azurewebsites.net/protected/recommendation',
         body,
         {
           headers: {
@@ -210,49 +212,44 @@ const ChatScreen = ({navigation}) => {
           messages={messages}
           onSend={(messages) => {
             onSend(messages);
-            //sendMessage(messages);
+            sendMessage(messages);
           }}
           user={{
             _id: 1,
           }}
           renderInputToolbar={(props) => (
             <View style = {styles.inputContainer}>
-              <InputToolbar {...props} style = {styles.inputToolbar}/>
               <View style = {styles.inputContainer2}>
-                    <Button 
-                        title="Pick an Image" onPress={pickImage}
-                        style={styles.buttonPickImage}/>
-                    <Button 
-                        title="Take photo" onPress={takePhoto}
-                        style={styles.buttonTakePhoto}/>
+                <InputToolbar {...props} containerStyle = {styles.inputToolbar} />
               </View>
+              <Button1
+                iconText='image'
+                onPressEvent={pickImage}/>
+              <Button1
+                iconText='photo-camera'
+                onPressEvent={takePhoto}/>
             </View>
           )}
         />
-        
       </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+       flex: 1,
     },
     inputContainer: {
-        flex: 1,
-        flexDirection: 'column',
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
     },
     inputContainer2: {
-        flexDirection: 'row',
-        alignSelf: 'flex-end',
-    },
-    buttonPickImage: {
-        
-    },
-    buttonTakePhoto: {
-        
+      flex: 1,
+      height: '100%',
     },
     inputToolbar: {
+      height: 50,
     },
 });
 

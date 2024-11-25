@@ -33,7 +33,7 @@
     "react-native-screens": "~4.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.25.2"
   },
   "private": true
 }
