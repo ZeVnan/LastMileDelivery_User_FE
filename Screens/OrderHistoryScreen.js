@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: 'row',
-    marginVertical: 20,
+    marginVertical: 10,
     width: '90%',
     alignSelf: 'center',
   },

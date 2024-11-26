@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Button } from 'react-native-elements';
+import QRCode from 'react-native-qrcode-svg'
 
 const OrderDetailScreen = ({navigation, route}) => {
     const [selectedTab, setSelectedTab] = useState('sender');
@@ -30,7 +31,7 @@ const OrderDetailScreen = ({navigation, route}) => {
         },
     }
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={styles.tabsContainer}>
                 <View style={styles.tabContainer}>
                     <Button
@@ -103,10 +104,22 @@ const OrderDetailScreen = ({navigation, route}) => {
             </View>
             {role === 'send' && (
                 <View style={styles.qrContainer}>
-
+                    <QRCode
+                        value={JSON.stringify(order._id)}
+                        size={300}/>
+                    {order.deliveryInfo.status === 'pending' && (
+                        <Text style={{paddingVertical: 10, textAlign: 'center'}}>
+                        Show this QR code to carrier before delivery.
+                        </Text>
+                    )}
+                    {order.deliveryInfo.status === 'inProgress' && (
+                        <Text style={{paddingVertical: 10, textAlign: 'center'}}>
+                        Show this QR code to carrier after taking back your order.
+                        </Text>
+                    )}
                 </View>
             )}
-        </View>
+        </ScrollView>
     );
 };
 
@@ -154,11 +167,11 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
     },
     qrContainer: {
-        flex: 1,
         padding: 10,
         backgroundColor: '#ffffff',
         borderRadius: 20,
-    }
+        alignItems: 'center',
+    },
 });
 
 export default OrderDetailScreen;
