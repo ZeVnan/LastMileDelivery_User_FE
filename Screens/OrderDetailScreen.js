@@ -1,179 +1,164 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { UserContext } from '../Utilities/UserContext';
+import { Button } from 'react-native-elements';
 
-const OrderDetailScreen = ({route}) => {
-  const [trackingData, setTrackingData] = useState(null);
-  const {item} = route.params;
-  const {userRole} = useContext(UserContext);
+const OrderDetailScreen = ({navigation, route}) => {
+    const [selectedTab, setSelectedTab] = useState('sender');
+    const {order, role} = route.params;
+    const fakeOrder = {
+        _id: '94jnfvk4',
+        senderInfo: {
+            userId: '1kebv83',
+            name: 'Brace Phoenix',
+            address: 'China',
+            phoneNumber: '11111',
+        },
+        receiverInfo: {
+            userId: 'c8j2msah',
+            name: 'November Ajax',
+            address: 'Unknown',
+            phoneNumber: '66666',
+        },
+        deliveryInfo: {
+            shipmentType: 'Package',
+            deliveryType: 'Express',
+            status: "pending",
+            packageSize: '5',
+            pickupDate: '2024-10-30',
+            pickupTime: '2024-11-15',
+            value: '10',
+        },
+    }
+    return (
+        <View style={styles.container}>
+            <View style={styles.tabsContainer}>
+                <View style={styles.tabContainer}>
+                    <Button
+                        title='Sender'
+                        onPress={()=>{setSelectedTab('sender')}}
+                        buttonStyle={[styles.tabLeft, selectedTab === 'sender' ? styles.activeTab : styles.inactiveTab]}/>
+                </View>
+                <View style={styles.tabContainer}>
+                    <Button
+                        title='Receiver'
+                        onPress={()=>{setSelectedTab('receiver')}}
+                        buttonStyle={[selectedTab === 'receiver' ? styles.activeTab : styles.inactiveTab]}/>
+                </View>
+                <View style={styles.tabContainer}>
+                    <Button
+                        title='Delivery'
+                        onPress={()=>{setSelectedTab('delivery')}}
+                        buttonStyle={[styles.tabRight, selectedTab === 'delivery' ? styles.activeTab : styles.inactiveTab]}/>
+                </View>
+            </View>
+            <View style={styles.infoContainer}>
+                <Text style={styles.textId}>
+                    #{fakeOrder._id}
+                </Text>
+                {selectedTab === 'sender' && (
+                    <View>
+                        <Text style={styles.textInfo}>
+                            Sender name: {order.senderInfo.name}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Sender address: {order.senderInfo.address}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Sender phone number: {order.senderInfo.phoneNumber}
+                        </Text>
+                    </View>
+                )}
+                {selectedTab === 'receiver' && (
+                    <View>
+                        <Text style={styles.textInfo}>
+                            Receiver name: {order.receiverInfo.name}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Receiver address: {order.receiverInfo.address}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Receiver phone number: {order.receiverInfo.phoneNumber}
+                        </Text>
+                    </View>
+                )}
+                {selectedTab === 'delivery' && (
+                    <View>
+                        <Text style={styles.textInfo}>
+                            Shipment type: {order.deliveryInfo.shipmentType}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Delivery type: {order.deliveryInfo.deliveryType}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Package size: {order.deliveryInfo.packageSize} kg
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Value: ${order.deliveryInfo.value}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Status: {order.deliveryInfo.status}
+                        </Text>
+                    </View>
+                )}
+            </View>
+            {role === 'send' && (
+                <View style={styles.qrContainer}>
 
-  useEffect(() => {
-    fetch('https://api.example.com/tracking/TY9860036NM')
-      .then(response => response.json())
-      .then(data => setTrackingData(data));
-  }, []);
-
-  const activity = ([place, time, detail]) => {
-    <View style={styles.activity}>
-      <Text style={styles.activityTitle}>
-        place time
-      </Text>
-      <Text style={styles.activityDetail}>
-        detail
-      </Text>
-    </View>
-  }
-
-  const dayActivity = ({day}) => {
-    <View style={styles.dayActivity}>
-      <Text style={styles.dayActivityTitle}>
-        day
-      </Text>
-      activity(["Hanoi", "6:38AM", "Processed at warehouse"])
-    </View>
-  }
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.trackingId}>Tracking ID: {item._id}</Text>
-      <Text style={styles.title}>{item.packageSize}kg package</Text>
-      <View style={styles.infoContainer}>
-        <Text style={styles.from}>{item.senderInfo.name}</Text>
-        <Text style={styles.toLabel}>To</Text>
-        <Text style={styles.to}>{item.receiverInfo.name}</Text>
-      </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.from}>{item.senderInfo.address}</Text>
-        <Text style={styles.toLabel}>To</Text>
-        <Text style={styles.to}>{item.receiverInfo.address}</Text>
-      </View>
-      <Text style={styles.info}>Shipment Type: {item.shipmentType}</Text>
-      <Text style={styles.info}>Delivery Type: {item.deliveryType}</Text>
-      {userRole === "sender" &&(
-        <View>
-          <Text style={styles.info}>Pick Up Date: {item.pickupDate}</Text>
-          <Text style={styles.info}>Pick Up Time: {item.pickupTime}</Text>
-          <Text style={styles.info}>Message: {item.message}</Text>
+                </View>
+            )}
         </View>
-      )}
-      <Text style={styles.status}>{item.status}</Text>
-      <ScrollView>
-        {/* <View style={styles.dayActivity}>
-          <Text style={styles.dayActivityTitle}>
-            30/6/2024
-          </Text>
-          <View style={styles.activity}>
-            <Text style={styles.activityTitle}>
-              Hanoi 8:43AM
-            </Text>
-            <Text style={styles.activityDetail}>
-              Processed at warehouse
-            </Text>
-          </View>
-          <View style={styles.activity}>
-            <Text style={styles.activityTitle}>
-              Hanoi 8:43AM
-            </Text>
-            <Text style={styles.activityDetail}>
-              Processed at warehouse
-            </Text>
-          </View>
-        </View>
-        <View style={styles.dayActivity}>
-          <Text style={styles.dayActivityTitle}>
-            30/6/2024
-          </Text>
-          <View style={styles.activity}>
-            <Text style={styles.activityTitle}>
-              Hanoi 8:43AM
-            </Text>
-            <Text style={styles.activityDetail}>
-              Processed at warehouse
-            </Text>
-          </View>
-          <View style={styles.activity}>
-            <Text style={styles.activityTitle}>
-              Hanoi 8:43AM
-            </Text>
-            <Text style={styles.activityDetail}>
-              Processed at warehouse
-            </Text>
-          </View>
-        </View> */}
-      </ScrollView>
-    </View>
-  );
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  trackingId: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  trackingId: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
-    marginBottom: 20,
-  },
-  status: {
-    fontSize: 13,
-    color: '#77C795',
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  from: {
-    fontSize: 13,
-    width: '45%',
-    textAlign: 'left',
-  },
-  to: {
-    fontSize: 13,
-    width: '45%',
-    textAlign: 'right',
-  },
-  toLabel: {
-    fontSize: 13,
-    width: '10%'
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    marginHorizontal: 10,
-    marginBottom: 20,
-  },
-  info: {
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  activity: {
-    marginHorizontal: 20,
-    marginVertical: 10,
-  },
-  activityTitle: {
-    fontSize: 13,
-    marginBottom: 5,
-    fontStyle: 'italic'
-  },
-  activityDetail: {
-    fontSize: 13,
-  },
-  dayActivity: {
-    marginHorizontal: 20,
-  },
-  dayActivityTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+    container: {
+        flex: 1,
+        padding: 20,
+    },
+    tabsContainer: {
+        flexDirection: 'row',
+        width: '90%',
+        alignSelf: 'center',
+    },
+    tabContainer: {
+        width: '33%',
+    },
+    tabLeft: {
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+    },
+    tabRight: {
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20,
+    },
+    inactiveTab: {
+        backgroundColor: '#c0c0c0'
+    },
+    activeTab: {
+        
+    },
+    infoContainer: {
+        width: '100%',
+        padding: 10,
+        marginVertical: 20,
+        backgroundColor: '#ffffff',
+        borderRadius: 20,
+    },
+    textId: {
+        fontSize: 18,
+        color: '#1ed102',
+        textAlign: 'center',
+    },
+    textInfo: {
+        fontSize: 13,
+        paddingVertical: 10,
+    },
+    qrContainer: {
+        flex: 1,
+        padding: 10,
+        backgroundColor: '#ffffff',
+        borderRadius: 20,
+    }
 });
 
 export default OrderDetailScreen;

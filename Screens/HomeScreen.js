@@ -37,6 +37,12 @@ const HomeScreen = ({navigation}) => {
         iconText: 'question-answer', 
         onPressEvent: () => navigation.navigate('Chat') 
     },
+    { 
+        id: '6', 
+        title: 'Order detail sample', 
+        iconText: 'info', 
+        onPressEvent: () => navigation.navigate('Order Detail') 
+    },
   ];
 
   const renderItem = ({ item }) => { 
