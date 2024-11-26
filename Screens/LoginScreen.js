@@ -9,19 +9,13 @@ const LoginScreen = ({onLogin}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
-  const {setUserId, setUserRole, userRole, setToken} = useContext(UserContext);
+  const {setUserId, setUserRole, userRole, setToken, setUserName} = useContext(UserContext);
 
   const togglePasswordVisibility = () =>{
     setIsPasswordHidden(!isPasswordHidden);
   }
 
   const handleLogin = async () => {
-    if (username === "1" && password ==="1"){
-      setUserId("1");
-      setUserRole("sender");
-      onLogin();
-      return;
-    }
     try{
       const response = await fetch('https://waseminarcnpm2.azurewebsites.net/auth/sign-in',{
         method: 'POST',
@@ -39,6 +33,7 @@ const LoginScreen = ({onLogin}) => {
         setUserId(result.data.id);
         setUserRole(result.data.role);
         setToken(result.data.token);
+        setUserName(username);
         if (userRole === "client"){
           onLogin();
         }

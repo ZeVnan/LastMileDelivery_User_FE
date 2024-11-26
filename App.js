@@ -27,43 +27,44 @@ export default function App() {
   const handleLogout = () => {
     setIsLoggedIn(false);
   }
-  // if (!isLoggedIn){
-  //   return (
-  //     <UserProvider>
-  //       <SafeAreaView style={styles.container}>
-  //         <LoginScreen onLogin={handleLogin}/>
-  //       </SafeAreaView>
-  //     </UserProvider>
-  //   )
-  // }
-  // return (
-  //   <UserProvider>
-  //     <SafeAreaView style={styles.container}>
-  //       <NavigationContainer>
-  //         <Stack.Navigator initialRouteName="Home">
-  //           <Stack.Screen name="Home" component={HomeScreen}/>
-  //           <Stack.Screen name="Chat" component={ChatScreen}/>
-  //           <Stack.Screen name="Sender Infomation" component={SenderInfoScreen}/>
-  //           <Stack.Screen name="Receiver Information" component={ReceiverInfoScreen}/>
-  //           <Stack.Screen name="Delivery Information" component={DeliveryInfoScreen}/>
-  //           <Stack.Screen name="CheckOut" component={CheckOutScreen}/>
-  //           <Stack.Screen name="Order History" component={OrderHisToryScreen}/>
-  //           <Stack.Screen name="Order Detail" component={OrderDetailScreen}/>
-  //           <Stack.Screen name="Profile">
-  //             {props => <ProfileScreen {...props} onLogout={handleLogout}/>}
-  //           </Stack.Screen>
-  //         </Stack.Navigator>
-  //       </NavigationContainer>
-  //     </SafeAreaView>
-  //   </UserProvider>
-  // );
+  if (!isLoggedIn){
+    return (
+      <UserProvider>
+        <SafeAreaView style={styles.container}>
+          <LoginScreen onLogin={handleLogin}/>
+        </SafeAreaView>
+      </UserProvider>
+    )
+  }
   return (
     <UserProvider>
       <SafeAreaView style={styles.container}>
-        <NotificationScreen/>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Home">
+            <Stack.Screen name="Home" component={HomeScreen}/>
+            <Stack.Screen name="Chat" component={ChatScreen}/>
+            <Stack.Screen name="Sender Infomation" component={SenderInfoScreen}/>
+            <Stack.Screen name="Receiver Information" component={ReceiverInfoScreen}/>
+            <Stack.Screen name="Delivery Information" component={DeliveryInfoScreen}/>
+            <Stack.Screen name="CheckOut" component={CheckOutScreen}/>
+            <Stack.Screen name="Order History" component={OrderHisToryScreen}/>
+            <Stack.Screen name="Order Detail" component={OrderDetailScreen}/>
+            <Stack.Screen name="Notification" component={NotificationScreen}/>
+            <Stack.Screen name="Profile">
+              {props => <ProfileScreen {...props} onLogout={handleLogout}/>}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
       </SafeAreaView>
     </UserProvider>
   );
+  // return (
+  //   <UserProvider>
+  //     <SafeAreaView style={styles.container}>
+  //       <NotificationScreen/>
+  //     </SafeAreaView>
+  //   </UserProvider>
+  // );
 }
 
 const styles = StyleSheet.create({

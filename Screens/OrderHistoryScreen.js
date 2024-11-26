@@ -14,32 +14,32 @@ const OrderHistoryScreen = ({navigation}) => {
     setSelectedTab(newTab);
   };
 
-  // useEffect(getOrder(userId, "send"), []);
-  // useEffect(getOrder(userId, "receive"), []);
+  useEffect(() => {getOrder(userId, "send")}, []);
+  useEffect(() => {getOrder(userId, "receive")}, []);
 
-  const getOrder = async(userId, status) => {
+  const getOrder = async(userId, type) => {
     try{
-      const response = await fetch('https://waseminarcnpm2.azurewebsites.net/getOrderByUserIdAndStatus', {
+      const response = await fetch('https://waseminarcnpm2.azurewebsites.net/getOrderByUserIdAndType', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, status }),
+        body: JSON.stringify({ userId, type }),
       });
       if (response.ok){
         const result = await response.json();
-        if (status === "send"){
+        if (type === "send"){
           setSendOrders(result.orders)
         }
-        else if (status === "receive"){
+        else if (type === "receive"){
           setReceiveOrder(result.orders)
         }
       }
       else{
-        if (status === "send"){
+        if (type === "send"){
           Alert.alert("Error", "Cannot load send orders")
         }
-        else if (status === "receive"){
+        else if (type === "receive"){
           Alert.alert("Error", "Cannot load receive orders")
         }
       }
@@ -87,10 +87,10 @@ const OrderHistoryScreen = ({navigation}) => {
       onPress={() => {}}>
       <OrderCard
         id = {item._id}
-        senderName={item.senderName}
-        receiverName={item.receiverName}
-        value={item.value}
-        status={item.status}/>
+        senderName={item.senderInfo.name}
+        receiverName={item.receiverInfo.name}
+        value={item.deliveryInfo.value}
+        status={item.deliveryInfo.status}/>
     </TouchableOpacity>
   );
 
@@ -115,14 +115,14 @@ const OrderHistoryScreen = ({navigation}) => {
       </View>
       {selectedTab === 'send' && (
         <FlatList
-          data={fakeSendOrders}
+          data={sendOrders}
           renderItem={renderItem}
           keyExtractor={item => item._id}
         />
       )}
       {selectedTab === 'receive' && (
         <FlatList
-          data={fakeReceiveOrders}
+          data={receiveOrders}
           renderItem={renderItem}
           keyExtractor={item => item._id}
         />
