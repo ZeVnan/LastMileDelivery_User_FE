@@ -84,7 +84,7 @@ const OrderHistoryScreen = ({navigation}) => {
   const renderItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.order}
-      onPress={() => {}}>
+      onPress={() => navigation.navigate('Order Detail', {order: item, role: selectedTab})}>
       <OrderCard
         id = {item._id}
         senderName={item.senderInfo.name}
