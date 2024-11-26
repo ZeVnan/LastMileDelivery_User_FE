@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     button0: {
         width: 70,
         height: 70,
-        borderRadius: 35,
+        borderRadius: 25,
     },
     button1:{
         width: 50,
