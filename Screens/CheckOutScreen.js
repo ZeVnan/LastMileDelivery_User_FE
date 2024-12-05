@@ -57,7 +57,7 @@ const CheckOutScreen = ({navigation, route}) => {
       }
       else{
         const result = await response.json()
-        console.log(result.err);
+        Alert.alert(result);
       }
     }
     catch(error){
@@ -147,7 +147,7 @@ const CheckOutScreen = ({navigation, route}) => {
       </ScrollView>
       <Button2 
         title="Pay Now" 
-        onPressEvent={async() => {await handleCheckout}} />
+        onPressEvent={handleCheckout} />
     </View>
   );
 };

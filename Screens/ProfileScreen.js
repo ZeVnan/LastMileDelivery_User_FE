@@ -20,7 +20,7 @@ const ProfileScreen = ({onLogout, navigation, route}) => {
             <Button title="Change Password" type="outline" onPress={() => {}} /> */}
         </View>
         <Button2 
-            title="Logout" 
+            title="Log Out" 
             onPressEvent={onLogout}/>
     </View>
   );
