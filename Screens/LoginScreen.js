@@ -34,7 +34,7 @@ const LoginScreen = ({onLogin}) => {
         setUserRole(result.data.role);
         setToken(result.data.token);
         setUserName(username);
-        if (userRole === "client"){
+        if (result.data.role === "client"){
           onLogin();
         }
       }
@@ -75,7 +75,7 @@ const LoginScreen = ({onLogin}) => {
         </View>
       </View>
       <Button2
-        title="Login" 
+        title="Log In" 
         onPressEvent={async() => {await handleLogin()}}
       />
     </View>

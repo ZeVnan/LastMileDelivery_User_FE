@@ -90,7 +90,10 @@ export const OrderCard = ( {id, senderName, receiverName, value, status}) => {
     return(
         <View style={stylesOrder.container}>
             <View style={[stylesOrder.containerRow,stylesOrder.containerRowOthers]}>
-                <Text style={stylesOrder.textId}>
+                <Text 
+                    style={stylesOrder.textId}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}>
                     #{id}
                 </Text>
             </View>

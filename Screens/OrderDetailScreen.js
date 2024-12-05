@@ -53,8 +53,11 @@ const OrderDetailScreen = ({navigation, route}) => {
                 </View>
             </View>
             <View style={styles.infoContainer}>
-                <Text style={styles.textId}>
-                    #{fakeOrder._id}
+                <Text 
+                    style={styles.textId}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}>
+                    #{order._id}
                 </Text>
                 {selectedTab === 'sender' && (
                     <View>
@@ -112,7 +115,7 @@ const OrderDetailScreen = ({navigation, route}) => {
                         Show this QR code to carrier before delivery.
                         </Text>
                     )}
-                    {order.deliveryInfo.status === 'inProgress' && (
+                    {order.deliveryInfo.status === 'failed' && (
                         <Text style={{paddingVertical: 10, textAlign: 'center'}}>
                         Show this QR code to carrier after taking back your order.
                         </Text>
