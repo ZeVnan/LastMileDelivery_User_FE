@@ -65,10 +65,14 @@ const DeliveryInfoScreen = ({navigation, route}) => {
             Alert.alert("Missing information", "Package size is missing");
             return;
         }
-        if (!/^\d+$/.test(deliveryInfoForm.packageSize)){
+        if (!/^[0-9]*\.?[0-9]*$/.test(deliveryInfoForm.packageSize)){
             Alert.alert("Wrong format", "Package size must be number");
             return;
         }
+        if (!/^[0-9]*\.?[0-9]*$/.test(deliveryInfoForm.value)){
+          Alert.alert("Wrong format", "Package size must be number");
+          return;
+      }
         navigation.navigate(
           'Check Out', 
             {senderInfo: senderInfo,

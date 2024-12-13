@@ -59,7 +59,12 @@ const CheckOutScreen = ({navigation, route}) => {
       });
       if (response.ok){
         const result = await response.json();
-        navigation.navigate('Payment', ({orderId: result.orderId}));
+        if (selectedPayType === 'momo'){
+          navigation.navigate('Payment', ({orderId: result.orderId, payResult: 'pending'}));
+        }
+        else {
+          navigation.navigate('Home');
+        }
       }
       else{
         const result = await response.json()
@@ -80,17 +85,17 @@ const CheckOutScreen = ({navigation, route}) => {
     Express: 3.00,
     SameDay: 8.00,
   }
-  const shippingFee = shippingFees[deliveryInfo.shipmentType] || 0;
-  const deliveryFee = deliveryFees[deliveryInfo.deliveryType] || 0;
+  const shippingFee = shippingFees[deliveryInfo.shipmentType] || 0.00;
+  const deliveryFee = deliveryFees[deliveryInfo.deliveryType] || 0.00;
   const discount = 2.00;
-  const total = deliveryInfo.value + shippingFee + deliveryFee - discount;
+  const total = Number(deliveryInfo.value) + shippingFee + deliveryFee - discount;
 
   const [openPayType, setOpenPayType] = useState(false);
   const [selectedPayType, setSelectedPayType] = useState('');
   const [payTypeItems, setPayTypeItems] = useState([
       { label: "Momo", value: "momo" },
       { label: "Cash", value: "cash" },
-      { label: "Wallet", value: "Wallet" }
+      { label: "Wallet", value: "wallet" }
   ]);
 
   return (
@@ -141,7 +146,7 @@ const CheckOutScreen = ({navigation, route}) => {
               placeholder="None"
               containerStyle={styles.dropDownPicker}/>
         <Button2 
-          title="Create Order And Pay" 
+          title={selectedPayType === 'momo' ? "Create Order And Pay" : "Create Order"}
           onPressEvent={handleCheckout} />
       </View>
     </View>
