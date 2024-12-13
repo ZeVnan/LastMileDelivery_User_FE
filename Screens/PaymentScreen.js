@@ -8,14 +8,24 @@ const PaymentScreen = ({navigation, route}) => {
   const {orderId, payResult} = route.params;
   const [order, setOrder] = useState([]);
   const [payUrl, setPayUrl] = useState('');
+  const [currentPayResult, setCurrentPayResult] = useState('');
+  const payResultText = currentPayResult === 'pending' ? 'Waiting for payment' 
+                      : currentPayResult === 'failed'  ? 'Payment failed'
+                      : currentPayResult === 'success' ? 'Payment successfull'
+                      : "Unknown";
+  useEffect(() => {
+    setCurrentPayResult(payResult);
+  },[payResult])
   const getIconProps = () => {
-    switch (payResult) {
+    switch (currentPayResult) {
         case 'pending':
             return { name: 'pending-actions', color: '#c7a302' };
         case 'failed':
             return { name: 'cancel', color: '#ed0707' };
         case 'success':
             return { name: 'check-circle', color: '#03ff2d' };
+        default:
+            return { name: 'help', color: '#000' };
     }
   }
   const iconProps = getIconProps();
@@ -39,12 +49,15 @@ const PaymentScreen = ({navigation, route}) => {
       Alert.alert("Error", "Something went wrong")
     }
   }
-  useEffect(() => {getOrder(orderId)}, []);
+  useEffect(() => {getOrder(orderId)}, [orderId]);
   const ReturnHome = () => {
     navigation.navigate('Home');
   }
   const Pay = async(amount) => {
-    amount = amount * 25000;
+    //amount = amount * 25000;
+    if (amount < 1000){
+      amount = 1000;
+    }
     try{
       const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/pay/momo?amount=${amount}`,{
         method: 'POST',
@@ -56,7 +69,6 @@ const PaymentScreen = ({navigation, route}) => {
       if (response.ok){
         const result = await response.json();
         setPayUrl(result.payUrl);
-        await Linking.openURL(result.payUrl);
       }
       else{
         Alert.alert("Error", `${response.status}`);
@@ -66,16 +78,61 @@ const PaymentScreen = ({navigation, route}) => {
       Alert.alert("Error", "Something went wrong");
     }
   }
-  const fakeData = {
-    orderId: '32mn59d3y4d',
-    value: '100',
-    payResult: 'failed',
-    sender: 'A',
-    receiver: 'B',
-    payWith: 'Momo',
+  const changeOrderPayStatus = async() => {
+    try{
+      const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/order/payStatus?id=${orderId}&payStatus=success`,{
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        //body: JSON.stringify({ amount }),
+      });
+      if (response.ok){
+        setCurrentPayResult('success');
+        setPayUrl('');
+      }
+      else{
+        Alert.alert("Error", `${response.status}`);
+      }
+    }
+    catch(error) {
+      Alert.alert("Error", "Something went wrong");
+    }
   }
+  const handleWebViewNavigationStateChange = async(navState) => {
+    //console.log('Navigated to URL:', navState.url);
+    const url = navState.url;
+    if (url.startsWith('https://test-payment.momo.vn/v2/gateway/credit/redirect')){
+      const urlParams = new URL(navState.url);
+      const resultCode = urlParams.searchParams.get('resultCode');
+      //console.log('Result code:', resultCode);
+      if (resultCode === "0"){
+        await changeOrderPayStatus();
+      }
+    }
+  }
+  // const fakeData = {
+  //   orderId: '32mn59d3y4d',
+  //   value: '100',
+  //   payResult: 'failed',
+  //   sender: 'A',
+  //   receiver: 'B',
+  //   payWith: 'Momo',
+  // }
   return (
     <View style={styles.container}>
+        {payUrl !== '' && (
+          <View style={styles.webViewContainer}>
+            <WebView
+              source={{uri: payUrl}}
+              onNavigationStateChange={handleWebViewNavigationStateChange}/>
+              {currentPayResult !== 'success' && (
+                <Button3
+                title={'Cancel'}
+                onPressEvent={() => {setPayUrl(''); setCurrentPayResult('failed')}}/>
+              )}
+          </View>
+        )}
         <View style={styles.contentContainer}>
           <Text style={styles.textTitle}>
             Payment for order 
@@ -87,10 +144,13 @@ const PaymentScreen = ({navigation, route}) => {
             ${order.deliveryInfo?.value}
           </Text>
           <Icon
-                    name={iconProps.name}
-                    type='material'
-                    size={100}
-                    color={iconProps.color}/>
+            name={iconProps.name}
+            type='material'
+            size={100}
+            color={iconProps.color}/>
+          <Text>
+            {payResultText}
+          </Text>
           <View style={styles.orderSummaryRow}>
             <Text style={styles.orderSummaryLabel}>Sender</Text>
             <Text style={styles.orderSummaryValue}>{order.senderInfo?.name}</Text>
@@ -104,7 +164,7 @@ const PaymentScreen = ({navigation, route}) => {
             <Text style={styles.orderSummaryValue}>{order.payWith}</Text>
           </View>
         </View>
-        {payResult === 'pending' && (
+        {currentPayResult === 'pending' && (
           <View>
             <Button2 
               title="Pay Now"
@@ -115,7 +175,7 @@ const PaymentScreen = ({navigation, route}) => {
               onPressEvent={ReturnHome}/>
           </View>
         )}
-        {payResult === 'failed' && (
+        {currentPayResult === 'failed' && (
           <View>
             <Button2 
               title="Pay Again"
@@ -126,7 +186,7 @@ const PaymentScreen = ({navigation, route}) => {
               onPressEvent={ReturnHome}/>
           </View>
         )}
-        {payResult === 'success' && (
+        {currentPayResult === 'success' && (
           <Button2
             title="Return Home"
             onPressEvent={ReturnHome}/>
