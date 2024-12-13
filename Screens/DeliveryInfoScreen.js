@@ -13,6 +13,7 @@ const DeliveryInfoScreen = ({navigation, route}) => {
         pickupDate: new Date(),
         pickupTime: new Date(),
         packageSize: 0,
+        value: 0,
     });
     const {senderInfo, receiverInfo} = route.params;
     //===SHIPMENT TYPE===
@@ -69,7 +70,7 @@ const DeliveryInfoScreen = ({navigation, route}) => {
             return;
         }
         navigation.navigate(
-          'CheckOut', 
+          'Check Out', 
             {senderInfo: senderInfo,
             receiverInfo: receiverInfo,
             deliveryInfo: deliveryInfoForm});
@@ -142,7 +143,13 @@ const DeliveryInfoScreen = ({navigation, route}) => {
               placeholder="Package Size (kg)"
               value={deliveryInfoForm.packageSize}
               onChangeText={(value) => setDeliveryInfoForm({...deliveryInfoForm, packageSize: value})}
-              keyboardType="numeric"/>     
+              keyboardType="numeric"/>
+            <TextInput
+              style={stylesInput.textInput0}
+              placeholder="Package Value ($)"
+              value={deliveryInfoForm.value}
+              onChangeText={(value) => setDeliveryInfoForm({...deliveryInfoForm, value: value})}
+              keyboardType="numeric"/>
           </View>
           <Button2
             title="Confirm Delivery Information"

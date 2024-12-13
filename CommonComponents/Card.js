@@ -86,7 +86,7 @@ export const InfoCard = ({name, address, phoneNumber, from}) => {
         );
     }
 }
-export const OrderCard = ( {id, senderName, receiverName, value, status}) => {
+export const OrderCard = ( {id, senderName, receiverName, value, deliveryStatus, paymentStatus}) => {
     return(
         <View style={stylesOrder.container}>
             <View style={[stylesOrder.containerRow,stylesOrder.containerRowOthers]}>
@@ -117,7 +117,12 @@ export const OrderCard = ( {id, senderName, receiverName, value, status}) => {
             </View>
             <View style={[stylesOrder.containerRow,stylesOrder.containerRowOthers]}>
                 <Text style={stylesOrder.textOthers}>
-                    Status: {status}
+                    Delivery Status: {deliveryStatus}
+                </Text>
+            </View>
+            <View style={[stylesOrder.containerRow,stylesOrder.containerRowOthers]}>
+                <Text style={stylesOrder.textOthers}>
+                    Payment Status: {paymentStatus}
                 </Text>
             </View>
         </View>
@@ -179,53 +184,53 @@ export const NotiCard = ({orderId, status, date, send}) => {
 const stylesInfo = StyleSheet.create({
     containerFrom: {
         flexDirection: 'column',
-        alignSelf: 'flex-start',
-        alignItems: 'flex-start',
         paddingHorizontal: 10,
         marginVertical: 5,
         borderRadius: 20,
         backgroundColor: '#c0c0c0',
+        width: '100%',
     },
     containerTo: {
         flexDirection: 'column',
-        alignSelf: 'flex-end',
-        alignItems: 'flex-end',
         paddingHorizontal: 10,
         marginVertical: 5,
         borderRadius: 20,
         backgroundColor: '#c0c0c0',
+        width: '100%',
     },
     infoContainerFrom: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
         marginVertical: 5,
         width: '100%',
     },
     infoContainerTo: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-end',
         marginVertical: 5,
         width: '100%',
     },
     infoTextFrom: {
         fontSize: 12,
-        textAlign: 'right',
-        maxWidth: '90%',
+        textAlign: 'left',
+        maxWidth: '95%',
     },
     infoTextTo: {
         fontSize: 12,
-        textAlign: 'left',
-        maxWidth: '90%',
+        textAlign: 'right',
+        maxWidth: '95%',
     },
     titleTextFrom: {
         fontSize: 16,
         fontWeight: 'bold',
-        textAlign: 'right',
+        textAlign: 'left',
     },
     titleTextTo: {
         fontSize: 16,
         fontWeight: 'bold',
-        textAlign: 'left',
+        textAlign: 'right',
     }
 })
 const stylesOrder = StyleSheet.create({

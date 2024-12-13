@@ -90,7 +90,8 @@ const OrderHistoryScreen = ({navigation}) => {
         senderName={item.senderInfo.name}
         receiverName={item.receiverInfo.name}
         value={item.deliveryInfo.value}
-        status={item.deliveryInfo.status}/>
+        deliveryStatus={item.deliveryInfo.status}
+        paymentStatus={item.payStatus}/>
     </TouchableOpacity>
   );
 

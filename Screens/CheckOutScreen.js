@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, Alert } from 'react-native';
-import { Button } from 'react-native-elements';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { UserContext } from '../Utilities/UserContext';
 import { InfoCard } from '../CommonComponents/Card';
 import { Button2 } from '../CommonComponents/Button';
 
 const CheckOutScreen = ({navigation, route}) => {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Master Card');
   const {senderInfo, receiverInfo, deliveryInfo} = route.params;
   const { token } = useContext(UserContext);
   
   const handleCheckout = async () => {
+    if (selectedPayType === ''){
+      Alert.alert("Missing Payment Method");
+      return;
+    }
     const hours = deliveryInfo.pickupTime.getHours().toString().padStart(2, '0');
     const minutes = deliveryInfo.pickupTime.getMinutes().toString().padStart(2, '0');
     const formattedTime = `${hours}:${minutes}`;
@@ -46,14 +49,17 @@ const CheckOutScreen = ({navigation, route}) => {
             packageSize: deliveryInfo.packageSize,
             pickupDate: formattedDate,
             pickupTime: formattedTime,
-            value: value,
+            value: deliveryInfo.value,
           },
           hudId: "",
           message: receiverInfo.message === "" ? "-" : receiverInfo.message,
+          payStatus: 'pending',
+          payWith: selectedPayType,
         }),
       });
       if (response.ok){
-        navigation.navigate('Home');
+        const result = await response.json();
+        navigation.navigate('Payment', ({orderId: result.orderId}));
       }
       else{
         const result = await response.json()
@@ -77,12 +83,19 @@ const CheckOutScreen = ({navigation, route}) => {
   const shippingFee = shippingFees[deliveryInfo.shipmentType] || 0;
   const deliveryFee = deliveryFees[deliveryInfo.deliveryType] || 0;
   const discount = 2.00;
-  const value = 10.00;
-  const total = value + shippingFee + deliveryFee - discount;
+  const total = deliveryInfo.value + shippingFee + deliveryFee - discount;
+
+  const [openPayType, setOpenPayType] = useState(false);
+  const [selectedPayType, setSelectedPayType] = useState('');
+  const [payTypeItems, setPayTypeItems] = useState([
+      { label: "Momo", value: "momo" },
+      { label: "Cash", value: "cash" },
+      { label: "Wallet", value: "Wallet" }
+  ]);
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView style={styles.scrollArea}>
         <View style={styles.itemContainer}>
           <Text style={styles.itemTitle}>Your Order</Text>
           <InfoCard
@@ -100,7 +113,7 @@ const CheckOutScreen = ({navigation, route}) => {
           <Text style={styles.itemTitle}>Summary</Text>
           <View style={styles.orderSummaryRow}>
             <Text style={styles.orderSummaryLabel}>Value</Text>
-            <Text style={styles.orderSummaryValue}>${value}</Text>
+            <Text style={styles.orderSummaryValue}>${deliveryInfo.value}</Text>
           </View>
           <View style={styles.orderSummaryRow}>
             <Text style={styles.orderSummaryLabel}>Transport Fee</Text>
@@ -115,39 +128,22 @@ const CheckOutScreen = ({navigation, route}) => {
             <Text style={[styles.orderSummaryValue, {fontWeight: 'bold'}]}>${total}</Text>
           </View>
         </View>
-        <View style={styles.itemContainer}>
-          <Text style={styles.itemTitle}>Select Payment Method</Text>
-          <ScrollView contentContainerStyle={styles.paymentMethodOptions}>
-            <Button
-              title="Master Card"
-              onPress={() => setSelectedPaymentMethod('Master Card')}
-              buttonStyle={
-                selectedPaymentMethod === 'Master Card'
-                  ? styles.selectedPaymentMethodButton
-                  : styles.paymentMethodButton
-              }
-            />
-              <Button
-                title="+ Add Card"
-                onPress={() => setSelectedPaymentMethod('Online Banking')}
-                buttonStyle={styles.addCardButton}
-                type="outline"
-              />
-            <Button
-              title="Online Banking"
-              onPress={() => setSelectedPaymentMethod('Online Banking')}
-              buttonStyle={
-                selectedPaymentMethod === 'Online Banking'
-                  ? styles.selectedPaymentMethodButton
-                  : styles.paymentMethodButton
-              }
-            />
-          </ScrollView>
-        </View>
       </ScrollView>
-      <Button2 
-        title="Pay Now" 
-        onPressEvent={handleCheckout} />
+      <View style={styles.itemContainer}>
+        <Text style={styles.itemTitle}>Select Payment Method</Text>
+        <DropDownPicker
+              open={openPayType}
+              value={selectedPayType}
+              items={payTypeItems}
+              setOpen={setOpenPayType}
+              setValue={setSelectedPayType}
+              setItems={setPayTypeItems}
+              placeholder="None"
+              containerStyle={styles.dropDownPicker}/>
+        <Button2 
+          title="Create Order And Pay" 
+          onPressEvent={handleCheckout} />
+      </View>
     </View>
   );
 };
@@ -157,28 +153,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  scrollArea: {
+    flex: 1,
+  },
   itemContainer: {
-
+    
   },
   itemTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     paddingVertical: 10,
-  },
-  paymentMethodOptions: {
-    flexDirection: 'row',
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  selectedPaymentMethodButton: {
-    marginVertical: 5
-  },
-  paymentMethodButton: {
-    marginVertical: 5,
-    backgroundColor: '#e6e6e6',
-  },
-  addCardButton: {
-    
   },
   orderSummaryRow: {
     flexDirection: 'row',
@@ -190,6 +174,9 @@ const styles = StyleSheet.create({
   },
   orderSummaryValue: {
     fontSize: 12,
+  },
+  dropDownPicker: {
+    marginBottom: 20,
   },
 });
 
