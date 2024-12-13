@@ -5,7 +5,7 @@ import { UserContext } from '../Utilities/UserContext';
 import { stylesInput } from '../CommonComponents/Input'
 import { Button2 } from '../CommonComponents/Button'
 
-const LoginScreen = ({onLogin}) => {
+const LoginScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
@@ -35,7 +35,7 @@ const LoginScreen = ({onLogin}) => {
         setToken(result.data.token);
         setUserName(username);
         if (result.data.role === "client"){
-          onLogin();
+          navigation.navigate('Home');
         }
       }
       else{

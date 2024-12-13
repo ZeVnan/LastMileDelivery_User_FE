@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { Button2 } from '../CommonComponents/Button';
 
-const ProfileScreen = ({onLogout, navigation, route}) => {
+const ProfileScreen = ({navigation, route}) => {
     const {userName} = route.params;
   return (
     <View style={styles.container}>
@@ -21,7 +21,7 @@ const ProfileScreen = ({onLogout, navigation, route}) => {
         </View>
         <Button2 
             title="Log Out" 
-            onPressEvent={onLogout}/>
+            onPressEvent={() => navigation.navigate('Login')}/>
     </View>
   );
 };
