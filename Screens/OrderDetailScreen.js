@@ -7,30 +7,6 @@ import { Button2 } from '../CommonComponents/Button';
 const OrderDetailScreen = ({navigation, route}) => {
     const [selectedTab, setSelectedTab] = useState('sender');
     const {order, role} = route.params;
-    const fakeOrder = {
-        _id: '94jnfvk4',
-        senderInfo: {
-            userId: '1kebv83',
-            name: 'Brace Phoenix',
-            address: 'China',
-            phoneNumber: '11111',
-        },
-        receiverInfo: {
-            userId: 'c8j2msah',
-            name: 'November Ajax',
-            address: 'Unknown',
-            phoneNumber: '66666',
-        },
-        deliveryInfo: {
-            shipmentType: 'Package',
-            deliveryType: 'Express',
-            status: "pending",
-            packageSize: '5',
-            pickupDate: '2024-10-30',
-            pickupTime: '2024-11-15',
-            value: '10',
-        },
-    }
     return (
         <ScrollView style={styles.container}>
             <View style={styles.tabsContainer}>
@@ -125,7 +101,7 @@ const OrderDetailScreen = ({navigation, route}) => {
                     </View>
                 )}
             </View>
-            {role === 'send' && (
+            {role === 'send' && order.payWith !== 'wallet' &&(
                 <View style={styles.qrContainer}>
                     {order.payWith === 'momo' && (
                         <>
@@ -136,15 +112,14 @@ const OrderDetailScreen = ({navigation, route}) => {
                                     </Text>
                                     <Button2
                                         title={'Pay Now'}
-                                        onPressEvent={() => {navigation.navigate('Payment', ({orderId: order._id, payResult: 'pending'}));}}
-                                        //onPressEvent={() => {Linking.openURL(`clientApp://payment/${order._id}/pending`)}}
+                                        onPressEvent={() => {navigation.navigate('Payment', ({order: order, payResult: 'pending'}));}}
                                         customStyle={{marginTop: 10,}}/>
                                 </>
                             )}
                             {order.payStatus === 'success' && (
                                 <>
                                     <QRCode
-                                        value={JSON.stringify(order._id, order.deliveryInfo.status)}
+                                        value={JSON.stringify({orderId: order._id, deliveryStatus: order.deliveryInfo.status})}
                                         size={300}/>
                                     {order.deliveryInfo.status === 'pending' && (
                                         <Text style={{paddingVertical: 10, textAlign: 'center'}}>
@@ -168,7 +143,7 @@ const OrderDetailScreen = ({navigation, route}) => {
                                 </Text>
                             )}
                             <QRCode
-                                value={JSON.stringify(order._id, order.deliveryInfo.status)}
+                                value={JSON.stringify({orderId: order._id, deliveryStatus: order.deliveryInfo.status})}
                                 size={300}/>
                             {order.deliveryInfo.status === 'pending' && (
                                 <Text style={{paddingVertical: 10, textAlign: 'center'}}>

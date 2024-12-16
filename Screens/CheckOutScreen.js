@@ -60,7 +60,8 @@ const CheckOutScreen = ({navigation, route}) => {
       if (response.ok){
         const result = await response.json();
         if (selectedPayType === 'momo'){
-          navigation.navigate('Payment', ({orderId: result.orderId, payResult: 'pending'}));
+          const order = result["order##"]
+          navigation.navigate('Payment', ({order: order, payResult: 'pending'}));
         }
         else {
           navigation.navigate('Home');
