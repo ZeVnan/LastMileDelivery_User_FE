@@ -5,8 +5,7 @@ import { WebView } from 'react-native-webview'
 import { Button2, Button3 } from '../CommonComponents/Button';
 
 const PaymentScreen = ({navigation, route}) => {
-  const {orderId, payResult} = route.params;
-  const [order, setOrder] = useState([]);
+  const {order, payResult} = route.params;
   const [payUrl, setPayUrl] = useState('');
   const [currentPayResult, setCurrentPayResult] = useState('');
   const payResultText = currentPayResult === 'pending' ? 'Waiting for payment' 
@@ -29,27 +28,6 @@ const PaymentScreen = ({navigation, route}) => {
     }
   }
   const iconProps = getIconProps();
-  const getOrder = async (orderId) => {
-    try {
-      const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/order?id=${orderId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (response.ok){
-        const result = await response.json();
-        setOrder(result);
-      }
-      else{
-        Alert.alert("Error", "Cannot load order information");
-      }
-    }
-    catch (error){
-      Alert.alert("Error", "Something went wrong")
-    }
-  }
-  useEffect(() => {getOrder(orderId)}, [orderId]);
   const ReturnHome = () => {
     navigation.navigate('Home');
   }
@@ -80,7 +58,7 @@ const PaymentScreen = ({navigation, route}) => {
   }
   const changeOrderPayStatus = async() => {
     try{
-      const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/order/payStatus?id=${orderId}&payStatus=success`,{
+      const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/order/payStatus?id=${order._id}&payStatus=success`,{
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -138,10 +116,10 @@ const PaymentScreen = ({navigation, route}) => {
             Payment for order 
           </Text>
           <Text style={[styles.textTitle, styles.textTitleHighlighted]} numberOfLines={1}adjustsFontSizeToFit={true}>
-            #{orderId}
+            #{order._id}
           </Text>
           <Text style={styles.textValue}>
-            ${order.deliveryInfo?.value}
+            ${order.deliveryInfo.value}
           </Text>
           <Icon
             name={iconProps.name}
@@ -153,11 +131,11 @@ const PaymentScreen = ({navigation, route}) => {
           </Text>
           <View style={styles.orderSummaryRow}>
             <Text style={styles.orderSummaryLabel}>Sender</Text>
-            <Text style={styles.orderSummaryValue}>{order.senderInfo?.name}</Text>
+            <Text style={styles.orderSummaryValue}>{order.senderInfo.name}</Text>
           </View>
           <View style={styles.orderSummaryRow}>
             <Text style={styles.orderSummaryLabel}>Receiver</Text>
-            <Text style={styles.orderSummaryValue}>{order.receiverInfo?.name}</Text>
+            <Text style={styles.orderSummaryValue}>{order.receiverInfo.name}</Text>
           </View>
           <View style={styles.orderSummaryRow}>
             <Text style={styles.orderSummaryLabel}>Pay with</Text>
@@ -169,7 +147,7 @@ const PaymentScreen = ({navigation, route}) => {
             <Button2 
               title="Pay Now"
               customStyle={styles.button}
-              onPressEvent={() => {Pay(order.deliveryInfo?.value)}}/>
+              onPressEvent={() => {Pay(order.deliveryInfo.value)}}/>
             <Button3
               title="Cancel"
               onPressEvent={ReturnHome}/>
@@ -180,7 +158,7 @@ const PaymentScreen = ({navigation, route}) => {
             <Button2 
               title="Pay Again"
               customStyle={styles.button}
-              onPressEvent={() => {Pay(order.deliveryInfo?.value)}}/>
+              onPressEvent={() => {Pay(order.deliveryInfo.value)}}/>
             <Button3
               title="Cancel"
               onPressEvent={ReturnHome}/>
