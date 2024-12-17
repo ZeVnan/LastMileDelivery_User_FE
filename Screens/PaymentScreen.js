@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert, Linking } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { WebView } from 'react-native-webview'
+import { WebView } from 'react-native-webview';
 import { Button2, Button3 } from '../CommonComponents/Button';
 
 const PaymentScreen = ({navigation, route}) => {

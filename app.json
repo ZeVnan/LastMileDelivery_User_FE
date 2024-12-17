@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "senderreceiver",
+    "name": "Client",
     "slug": "snack-a74203e5-a36f-4673-904a-d7cd3f347298",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,23 +11,29 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "scheme": "clientApp",
+    "scheme": "clientapp",
     "platforms": [
       "ios",
       "android"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.LMD.Client"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "build01.apk"
+      "package": "com.LMD.Client"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6f6fe06c-3718-4323-9090-39aad0e69b1b"
+      }
     }
   }
 }
