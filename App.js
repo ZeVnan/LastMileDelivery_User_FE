@@ -1,6 +1,10 @@
-import { SafeAreaView, StyleSheet, Linking } from 'react-native';
+import React, { useEffect } from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Notification from 'expo-notifications';
+import * as Device from 'expo-device';
+import firebaseApp from './Utilities/FirebaseConfig';
 
 import HomeScreen from './Screens/HomeScreen';
 import ChatScreen from './Screens/ChatScreen';
@@ -40,6 +44,30 @@ const linking = {
 }
 
 export default function App() {
+  async function registerForPushNotification() {
+    if (Device.isDevice){
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      //console.log("Expo Push Token:", token);
+    }
+    else{
+      alert("Must be physical device for push notification");
+    }
+  }
+  useEffect(() => {
+    registerForPushNotification();
+  }, []);
+
   return (
     <UserProvider>
       <SafeAreaView style={styles.container}>
