@@ -21,27 +21,6 @@ import PaymentScreen from './Screens/PaymentScreen';
 import { UserProvider } from './Utilities/UserContext';
 
 const Stack = createNativeStackNavigator();
-const linking = {
-  prefixes: ['clientApp://'],
-  config: {
-    screens: {
-      Login: 'login',
-      Home: 'home',
-      Chat: 'chat',
-      'Sender Infomation': 'sender-info',
-      'Receiver Information': 'receiver-info',
-      'Delivery Information': 'delivery-info',
-      'Check Out': 'checkout',
-      'Order History': 'order-history',
-      'Order Detail': 'order-detail',
-      Notification: 'notification',
-      Profile: 'profile',
-      Payment: {
-        path: "payment/:orderId/:payResult"
-      },
-    }
-  }
-}
 
 export default function App() {
   async function registerForPushNotification() {
@@ -71,7 +50,7 @@ export default function App() {
   return (
     <UserProvider>
       <SafeAreaView style={styles.container}>
-        <NavigationContainer linking={linking}>
+        <NavigationContainer>
           <Stack.Navigator initialRouteName="Login">
             <Stack.Screen 
               name='Login'
