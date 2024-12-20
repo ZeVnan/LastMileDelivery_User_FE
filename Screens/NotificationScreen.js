@@ -58,7 +58,7 @@ const NotificationScreen = () => {
     const renderSendItem = ({item}) => (
         <View style={styles.notification}>
             <NotiCard
-                orderId={item._id}
+                orderId={item.orderId}
                 about={item.about}
                 status={item.status}
                 date={item.date}
@@ -68,7 +68,7 @@ const NotificationScreen = () => {
     const renderReceiveItem = ({item}) => (
         <View style={styles.notification}>
             <NotiCard
-                orderId={item._id}
+                orderId={item.orderId}
                 about={item.about}
                 status={item.status}
                 date={item.date}
