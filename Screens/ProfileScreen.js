@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { Button2 } from '../CommonComponents/Button';
+import { OneSignal } from 'react-native-onesignal';
 
 const ProfileScreen = ({navigation, route}) => {
     const {userName} = route.params;
@@ -21,7 +22,7 @@ const ProfileScreen = ({navigation, route}) => {
         </View>
         <Button2 
             title="Log Out" 
-            onPressEvent={() => navigation.navigate('Login')}/>
+            onPressEvent={() => {navigation.navigate('Login'); OneSignal.logout();}}/>
     </View>
   );
 };

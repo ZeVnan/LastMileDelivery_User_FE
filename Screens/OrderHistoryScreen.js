@@ -10,10 +10,6 @@ const OrderHistoryScreen = ({navigation}) => {
   const [selectedTab, setSelectedTab] = useState("send");
   const { userId } = useContext(UserContext);
 
-  const handleTabChange = (newTab) => {
-    setSelectedTab(newTab);
-  };
-
   useEffect(() => {getOrder(userId, "send")}, []);
   useEffect(() => {getOrder(userId, "receive")}, []);
 
@@ -48,38 +44,6 @@ const OrderHistoryScreen = ({navigation}) => {
       Alert.alert("Error", "Something went wrong")
     }
   }
-  const fakeSendOrders = [
-    {
-      _id: '0',
-      senderName: 'Crimson Typhoon',
-      receiverName: 'Striker Eureka',
-      value: '10',
-      status: 'Pending',
-    },
-    {
-      _id: '1',
-      senderName: 'Crimson Typhoon',
-      receiverName: 'Vulcan Specter',
-      value: '20',
-      status: 'Completed',
-    },
-  ];
-  const fakeReceiveOrders = [
-    {
-      _id: '0',
-      senderName: 'Gipsy Danger',
-      receiverName: 'Cherno Alpha',
-      value: '10',
-      status: 'Completed',
-    },
-    {
-      _id: '1',
-      senderName: 'Saber Athena',
-      receiverName: 'Titan Redeemer',
-      value: '20',
-      status: 'In progress',
-    },
-  ];
 
   const renderItem = ({ item }) => (
     <TouchableOpacity 
@@ -101,33 +65,24 @@ const OrderHistoryScreen = ({navigation}) => {
         <View style={styles.tabContainer}>
           <Button
             title="Send"
-            onPress={() => handleTabChange('send')}
+            onPress={() => {setSelectedTab('send')}}
             buttonStyle={[styles.tabLeft, selectedTab === 'send' ? styles.activeTab : styles.inactiveTab]}
           />
         </View>
         <View style={styles.tabContainer}>
           <Button
             title="Receive"
-            onPress={() => handleTabChange('receive')}
+            onPress={() => {setSelectedTab('receive')}}
             buttonStyle={[styles.tabRight, selectedTab === 'receive' ? styles.activeTab : styles.inactiveTab]}
           />
         </View>
         
       </View>
-      {selectedTab === 'send' && (
-        <FlatList
-          data={sendOrders}
-          renderItem={renderItem}
-          keyExtractor={item => item._id}
-        />
-      )}
-      {selectedTab === 'receive' && (
-        <FlatList
-          data={receiveOrders}
-          renderItem={renderItem}
-          keyExtractor={item => item._id}
-        />
-      )}
+      <FlatList
+        data={selectedTab == 'send' ? sendOrders : receiveOrders}
+        renderItem={renderItem}
+        keyExtractor={item => item._id}
+      />
     </View>
   );
 };

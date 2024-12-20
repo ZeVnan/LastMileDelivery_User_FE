@@ -128,26 +128,47 @@ export const OrderCard = ( {id, senderName, receiverName, value, deliveryStatus,
         </View>
     );
 }
-export const NotiCard = ({orderId, status, date, send}) => {
+export const NotiCard = ({orderId, about, status, date, send}) => {
     const getMessage = () => {
         if (send === true){
-            switch(status){
-                case 'pending':
-                    return(`You created order #${orderId}.`);
-                case 'inProgress':
-                    return(`You delivered order #${orderId} to the carrier to transport.`);
-                case 'completed':
-                    return(`The order #${orderId} is delivered to the receiver.`);
+            if (about === 'delivery'){
+                switch(status){
+                    case 'pending':
+                        return(`You have created order #${orderId}.`);
+                    case 'inProgress':
+                        return(`You have delivered order #${orderId} to the carrier.`);
+                    case 'success':
+                        return(`The order #${orderId} has been delivered to the receiver.`);
+                    case 'failed':
+                        return(`The order #${orderId} was failed to delivered to the receiver.`);
+                    case 'canceled':
+                        return(`The order #${orderId} has been returned to you.`);
+                }
             }
+            else{
+                switch(status){
+                    case 'pending':
+                        return(`The order #${orderId} is awaiting payment.`);
+                    case 'success':
+                        return(`You paid the order #${orderId} successfully.`);
+                    case 'canceled':
+                        return(`The order #${orderId} has been canceled.`);
+                }
+            }
+            
         }
         else{
-            switch(status){
-                case 'pending':
-                    return(`The sender is preparing order #${orderId}.`);
-                case 'inProgress':
-                    return(`The order #${orderId} is delivered to the carrier by sender and being transport.`);
-                case 'completed':
-                    return(`The order #${orderId} is delivered to you.`);
+            if (about === 'delivery'){
+                switch(status){
+                    case 'pending':
+                        return(`The order #${orderId} is being prepared.`);
+                    case 'inProgress':
+                        return(`The order #${orderId} has been delivered to the carrier by the sender.`);
+                    case 'success':
+                        return(`The order #${orderId} has been delivered to you.`);
+                    case 'failed':
+                        return(`The order #${orderId} was failed to delivered to you (rejected 3 times).`);
+                }
             }
         }
     }
@@ -157,8 +178,12 @@ export const NotiCard = ({orderId, status, date, send}) => {
                 return { name: 'pending-actions', color: '#c7a302' };
             case 'inProgress':
                 return { name: 'cached', color: '#05cdff' };
-            case 'completed':
+            case 'success':
                 return { name: 'done', color: '#03ff2d' };
+            case 'failed':
+                return { name: 'cancel', color: '#ed0707' };
+            case 'canceled':
+                return { name: 'block', color: '#ed0707' }
         }
     }
     const message = getMessage();
@@ -175,6 +200,9 @@ export const NotiCard = ({orderId, status, date, send}) => {
             <View style={stylesNoti.messageContainer}>
                 <Text style={stylesNoti.message}>
                     {message}
+                </Text>
+                <Text style={stylesNoti.date}>
+                    {date}
                 </Text>
             </View>
         </View>
@@ -284,5 +312,9 @@ const stylesNoti = StyleSheet.create({
     },
     message: {
         fontSize: 13,
+    },
+    date: {
+        fontSize: 11,
+        fontWeight: '300',
     }
 })

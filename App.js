@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { LogLevel, OneSignal } from 'react-native-onesignal';
+import Constants from "expo-constants";
 
 import HomeScreen from './Screens/HomeScreen';
 import ChatScreen from './Screens/ChatScreen';
@@ -18,6 +20,11 @@ import PaymentScreen from './Screens/PaymentScreen';
 import { UserProvider } from './Utilities/UserContext';
 
 const Stack = createNativeStackNavigator();
+OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+OneSignal.initialize(Constants.expoConfig.extra.oneSignalAppId);
+
+// Also need enable notifications to complete OneSignal setup
+OneSignal.Notifications.requestPermission(true);
 
 export default function App() {
   return (

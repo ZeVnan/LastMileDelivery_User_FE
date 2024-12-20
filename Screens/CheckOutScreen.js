@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, Alert } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { UserContext } from '../Utilities/UserContext';
 import { InfoCard } from '../CommonComponents/Card';
 import { Button2 } from '../CommonComponents/Button';
+import { createNotification, pushNotification } from '../Utilities/Notification';
 
 const CheckOutScreen = ({navigation, route}) => {
   const {senderInfo, receiverInfo, deliveryInfo} = route.params;
@@ -61,6 +62,20 @@ const CheckOutScreen = ({navigation, route}) => {
         const result = await response.json();
         if (selectedPayType === 'momo'){
           const order = result["order##"]
+          createNotification(order, 'delivery', 'pending', token);
+          createNotification(order, 'payment', 'pending', token);
+          pushNotification(
+            order.senderInfo.userId,
+            `Order #${order._id} has an delivery update.`,
+            `The order has been created.`);
+          pushNotification(
+            order.senderInfo.userId,
+            `Order #${order._id} has an payment update.`,
+            `The order is awaiting payment.`);
+          pushNotification(
+            order.receiverInfo.userId,
+            `Order #${order._id} has an delivery update.`,
+            `The order is being prepared.`);
           navigation.navigate('Payment', ({order: order, payResult: 'pending'}));
         }
         else {
