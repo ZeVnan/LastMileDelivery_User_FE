@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Alert, Linking } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { WebView } from 'react-native-webview';
 import { Button2, Button3 } from '../CommonComponents/Button';
+import { UserContext } from '../Utilities/UserContext';
+import { createNotification, pushNotification } from '../Utilities/Notification';
 
 const PaymentScreen = ({navigation, route}) => {
   const {order, payResult} = route.params;
@@ -12,6 +14,7 @@ const PaymentScreen = ({navigation, route}) => {
                       : currentPayResult === 'failed'  ? 'Payment failed'
                       : currentPayResult === 'success' ? 'Payment successfull'
                       : "Unknown";
+  const { token } = useContext(UserContext);
   useEffect(() => {
     setCurrentPayResult(payResult);
   },[payResult])
@@ -66,8 +69,12 @@ const PaymentScreen = ({navigation, route}) => {
         //body: JSON.stringify({ amount }),
       });
       if (response.ok){
-        setCurrentPayResult('success');
-        setPayUrl('');
+        createNotification(order, 'payment', 'success', token);
+        pushNotification(
+          order.senderInfo.userId,
+          `Order #${order._id} has an payment update.`,
+          `The order has been paid.`);
+        
       }
       else{
         Alert.alert("Error", `${response.status}`);
@@ -78,13 +85,14 @@ const PaymentScreen = ({navigation, route}) => {
     }
   }
   const handleWebViewNavigationStateChange = async(navState) => {
-    //console.log('Navigated to URL:', navState.url);
     const url = navState.url;
     if (url.startsWith('https://test-payment.momo.vn/v2/gateway/credit/redirect')){
+      //console.log('Navigated to URL:', navState.url);
       const urlParams = new URL(navState.url);
       const resultCode = urlParams.searchParams.get('resultCode');
-      //console.log('Result code:', resultCode);
-      if (resultCode === "0"){
+      setPayUrl('');
+      if (resultCode === "0" && currentPayResult !== 'success'){
+        await setCurrentPayResult('success');
         await changeOrderPayStatus();
       }
     }

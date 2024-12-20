@@ -33,7 +33,16 @@
     "extra": {
       "eas": {
         "projectId": "6f6fe06c-3718-4323-9090-39aad0e69b1b"
-      }
-    }
+      },
+      "oneSignalAppId": "9aea25d1-efcd-4578-9fad-ffeb401ae64e"
+    },
+    "plugins": [
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "development"
+        }
+      ]
+    ]
   }
 }

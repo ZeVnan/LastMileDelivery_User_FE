@@ -4,6 +4,7 @@ import { Button } from 'react-native-elements';
 import { UserContext } from '../Utilities/UserContext';
 import { stylesInput } from '../CommonComponents/Input'
 import { Button2 } from '../CommonComponents/Button'
+import { OneSignal } from 'react-native-onesignal';
 
 const LoginScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -36,6 +37,7 @@ const LoginScreen = ({navigation}) => {
         setUserName(username);
         if (result.data.role === "client"){
           navigation.navigate('Home');
+          OneSignal.login(result.data.id);
         }
       }
       else{

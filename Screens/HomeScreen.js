@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { StyleSheet, View, FlatList, Text } from 'react-native';
+import { StyleSheet, View, FlatList, Text, ImageBackground } from 'react-native';
 import { UserContext } from '../Utilities/UserContext';
 import { Button0 } from '../CommonComponents/Button';
 
@@ -31,12 +31,12 @@ const HomeScreen = ({navigation}) => {
         iconText: 'local-shipping', 
         onPressEvent: () => navigation.navigate('Sender Infomation') 
     },
-    { 
-        id: '5', 
-        title: 'Help with packaging', 
-        iconText: 'question-answer', 
-        onPressEvent: () => navigation.navigate('Chat') 
-    },
+    // { 
+    //     id: '5', 
+    //     title: 'Help with packaging', 
+    //     iconText: 'question-answer', 
+    //     onPressEvent: () => navigation.navigate('Chat') 
+    // },
     // { 
     //     id: '6', 
     //     title: 'Order detail sample', 
@@ -59,9 +59,16 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-        <Text style={styles.helloText}>
-            Hello {userName} !
-        </Text>
+        <View style={styles.imageContainer}>
+            <ImageBackground
+                source={require('../assets/plain.jpg')}
+                style={styles.image}
+                imageStyle={styles.imageContent}>
+                <Text style={styles.helloText}>
+                    Hello {userName} !
+                </Text>
+            </ImageBackground>
+        </View>
         <FlatList
             data={data}
             renderItem={renderItem}
@@ -88,7 +95,18 @@ const styles = StyleSheet.create({
     helloText: {
         fontSize: 20,
         fontWeight: '500',
+        margin: 15,
     },
+    image: {
+        width: '100%',
+        height: '100%',
+    },
+    imageContainer: {
+        height: '25%',
+    },
+    imageContent: {
+        borderRadius: 15,
+    }
 });
 
 export default HomeScreen;
