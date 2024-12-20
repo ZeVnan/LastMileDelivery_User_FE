@@ -70,11 +70,6 @@ const PaymentScreen = ({navigation, route}) => {
       });
       if (response.ok){
         createNotification(order, 'payment', 'success', token);
-        pushNotification(
-          order.senderInfo.userId,
-          `Order #${order._id} has an payment update.`,
-          `The order has been paid.`);
-        
       }
       else{
         Alert.alert("Error", `${response.status}`);
@@ -93,6 +88,11 @@ const PaymentScreen = ({navigation, route}) => {
       setPayUrl('');
       if (resultCode === "0" && currentPayResult !== 'success'){
         await setCurrentPayResult('success');
+        await pushNotification(
+          order.senderInfo.userId,
+          `Order #${order._id} has an payment update.`,
+          `The order has been paid.`,
+          token);
         await changeOrderPayStatus();
       }
     }
