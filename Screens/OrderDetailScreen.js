@@ -101,7 +101,10 @@ const OrderDetailScreen = ({navigation, route}) => {
                     </View>
                 )}
             </View>
-            {role === 'send' && order.payWith !== 'wallet' &&(
+            {role === 'send' && 
+            order.payWith !== 'wallet' && 
+            (order.deliveryInfo.status === 'pending' || order.deliveryInfo.status === 'failed') &&
+            (
                 <View style={styles.qrContainer}>
                     {order.payWith === 'momo' && (
                         <>
