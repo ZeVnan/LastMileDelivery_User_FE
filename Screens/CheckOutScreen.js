@@ -67,15 +67,18 @@ const CheckOutScreen = ({navigation, route}) => {
           pushNotification(
             order.senderInfo.userId,
             `Order #${order._id} has an delivery update.`,
-            `The order has been created.`);
+            `The order has been created.`,
+            token);
           pushNotification(
             order.senderInfo.userId,
             `Order #${order._id} has an payment update.`,
-            `The order is awaiting payment.`);
+            `The order is awaiting payment.`, 
+            token);
           pushNotification(
             order.receiverInfo.userId,
             `Order #${order._id} has an delivery update.`,
-            `The order is being prepared.`);
+            `The order is being prepared.`,
+            token);
           navigation.navigate('Payment', ({order: order, payResult: 'pending'}));
         }
         else {

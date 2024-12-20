@@ -140,7 +140,7 @@ export const NotiCard = ({orderId, about, status, date, send}) => {
                     case 'success':
                         return(`The order #${orderId} has been delivered to the receiver.`);
                     case 'failed':
-                        return(`The order #${orderId} was failed to delivered to the receiver.`);
+                        return(`The order #${orderId} has failed to be delivered to the receiver.`);
                     case 'canceled':
                         return(`The order #${orderId} has been returned to you.`);
                 }
@@ -167,7 +167,7 @@ export const NotiCard = ({orderId, about, status, date, send}) => {
                     case 'success':
                         return(`The order #${orderId} has been delivered to you.`);
                     case 'failed':
-                        return(`The order #${orderId} was failed to delivered to you (rejected 3 times).`);
+                        return(`The order #${orderId} has failed to be delivered to you (rejected 3 times).`);
                 }
             }
         }
