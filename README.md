@@ -12,13 +12,13 @@ The application is built using **React Native Expo Managed Workflow** as the pri
 ## How to Install and Test  
 
   1. Clone the project:  
-    git clone [<repository-url>](https://github.com/ZeVnan/LastMileDelivery_User_FE)
+    git clone https://github.com/ZeVnan/LastMileDelivery_User_FE
   2. Install dependencies:
-    npm install
+    Run npm install
   3. Download and install Expo Go from the App Store or Google Play.
   4. Start the Expo development server:
-    npx expo start
+    Run npx expo start
   5. Use the Expo Go app to scan the QR code displayed in your terminal to launch the application.
   6. (Optional) Run on a Native Environment:
-    npx expo run:android
-    npx expo run:ios
+    Run npx expo run:android
+    Run npx expo run:ios
