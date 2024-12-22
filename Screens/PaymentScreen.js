@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { WebView } from 'react-native-webview';
 import { Button2, Button3 } from '../CommonComponents/Button';
@@ -31,10 +31,7 @@ const PaymentScreen = ({navigation, route}) => {
     }
   }
   const iconProps = getIconProps();
-  const ReturnHome = () => {
-    navigation.navigate('Home');
-  }
-  const Pay = async(amount) => {
+  const PayMomo = async(amount) => {
     //amount = amount * 25000;
     if (amount < 1000){
       amount = 1000;
@@ -97,14 +94,6 @@ const PaymentScreen = ({navigation, route}) => {
       }
     }
   }
-  // const fakeData = {
-  //   orderId: '32mn59d3y4d',
-  //   value: '100',
-  //   payResult: 'failed',
-  //   sender: 'A',
-  //   receiver: 'B',
-  //   payWith: 'Momo',
-  // }
   return (
     <View style={styles.container}>
         {payUrl !== '' && (
@@ -155,10 +144,10 @@ const PaymentScreen = ({navigation, route}) => {
             <Button2 
               title="Pay Now"
               customStyle={styles.button}
-              onPressEvent={() => {Pay(order.deliveryInfo.value)}}/>
+              onPressEvent={() => {PayMomo(order.deliveryInfo.value)}}/>
             <Button3
               title="Cancel"
-              onPressEvent={ReturnHome}/>
+              onPressEvent={() => {navigation.navigate('Home')}}/>
           </View>
         )}
         {currentPayResult === 'failed' && (
@@ -166,16 +155,16 @@ const PaymentScreen = ({navigation, route}) => {
             <Button2 
               title="Pay Again"
               customStyle={styles.button}
-              onPressEvent={() => {Pay(order.deliveryInfo.value)}}/>
+              onPressEvent={() => {PayMomo(order.deliveryInfo.value)}}/>
             <Button3
               title="Cancel"
-              onPressEvent={ReturnHome}/>
+              onPressEvent={() => {navigation.navigate('Home')}}/>
           </View>
         )}
         {currentPayResult === 'success' && (
           <Button2
             title="Return Home"
-            onPressEvent={ReturnHome}/>
+            onPressEvent={() => {navigation.navigate('Home')}}/>
         )}
     </View>
   );
