@@ -1,11 +1,24 @@
-# Sample Snack app
+# Mobile Application for Customers Focusing on Last-Mile Delivery
 
-Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by scanning the **QR code** or use the iOS or Android emulators. When you're done, click **Save** and share the link!
+This project is part of an e-commerce system focusing on last-mile delivery and serves as the final project for the **SE405 course - Mobile Pervasive and Computing** at UIT.  
 
-When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Download** your project and use it with [expo cli](https://docs.expo.dev/get-started/installation/#expo-cli)).
+The application is built using **React Native Expo Managed Workflow** as the primary development technology.  
 
-All projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the `<>` button.
+## Contributors  
 
-If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.dev/c/expo-dev-tools/61) or [Discord](https://chat.expo.dev/).
+- **Nguyễn Thành Thiện Ân** - 21521812  
+- **Bùi Cường** - 21521898  
 
-Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack).
+## How to Install and Test  
+
+  1. Clone the project:  
+    git clone https://github.com/ZeVnan/LastMileDelivery_User_FE  
+  2. Install dependencies:  
+    Run npm install  
+  3. Download and install Expo Go from the App Store or Google Play.  
+  4. Start the Expo development server:  
+    Run npx expo start  
+  5. Use the Expo Go app to scan the QR code displayed in your terminal to launch the application.  
+  6. (Optional) Run on a Native Environment:  
+    Run npx expo run:android  
+    Run npx expo run:ios  

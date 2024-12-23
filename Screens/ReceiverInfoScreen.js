@@ -64,18 +64,20 @@ const ReceiverInfoScreen = ({navigation, route}) => {
       if (response.ok){
         const result = await response.json();
         setReceiverInfoForm({...receiverInfoForm, receiverId: result.userId})
+        return result.userId;
+      }
+      else{
+        setReceiverInfoForm({...receiverInfoForm, receiverId: ''})
+        return '';
       }
     }
     catch (error){
       Alert.alert(`${error.message}`);
+      setReceiverInfoForm({...receiverInfoForm, receiverId: ''})
+      return '';
     }
   }
   const handleReceiverInfo = async() => {
-    await getUserId();
-    if (receiverInfoForm.receiverId === ""){
-      Alert.alert("Missing data", "Receiver username is missing or not found");
-      return;
-    }
     if (receiverInfoForm.receiverName === ""){
       Alert.alert("Missing information", "Receiver name is missing");
       return;
@@ -88,8 +90,22 @@ const ReceiverInfoScreen = ({navigation, route}) => {
       Alert.alert("Missing information", "Receiver address is missing");
       return;
     }
-    navigation.navigate('Delivery Information', {senderInfo: senderInfo, receiverInfo: receiverInfoForm});
+    const userId = await getUserId();
+    if (userId === ''){
+      
+      Alert.alert("Missing data", "Receiver username is missing or not found");
+      return;
+    }
   };
+  useEffect(
+    () => {
+      if (receiverInfoForm.receiverId !== ''){
+        
+        navigation.navigate('Delivery Information', {senderInfo: senderInfo, receiverInfo: receiverInfoForm});
+      }
+    },
+    [receiverInfoForm.receiverId]
+  )
 
   return (
     <View style = {styles.container}>

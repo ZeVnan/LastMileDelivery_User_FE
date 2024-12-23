@@ -1,179 +1,225 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { UserContext } from '../Utilities/UserContext';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Linking } from 'react-native';
+import { Button } from 'react-native-elements';
+import QRCode from 'react-native-qrcode-svg'
+import { Button2 } from '../CommonComponents/Button';
 
-const OrderDetailScreen = ({route}) => {
-  const [trackingData, setTrackingData] = useState(null);
-  const {item} = route.params;
-  const {userRole} = useContext(UserContext);
-
-  useEffect(() => {
-    fetch('https://api.example.com/tracking/TY9860036NM')
-      .then(response => response.json())
-      .then(data => setTrackingData(data));
-  }, []);
-
-  const activity = ([place, time, detail]) => {
-    <View style={styles.activity}>
-      <Text style={styles.activityTitle}>
-        place time
-      </Text>
-      <Text style={styles.activityDetail}>
-        detail
-      </Text>
-    </View>
-  }
-
-  const dayActivity = ({day}) => {
-    <View style={styles.dayActivity}>
-      <Text style={styles.dayActivityTitle}>
-        day
-      </Text>
-      activity(["Hanoi", "6:38AM", "Processed at warehouse"])
-    </View>
-  }
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.trackingId}>Tracking ID: {item._id}</Text>
-      <Text style={styles.title}>{item.packageSize}kg package</Text>
-      <View style={styles.infoContainer}>
-        <Text style={styles.from}>{item.senderInfo.name}</Text>
-        <Text style={styles.toLabel}>To</Text>
-        <Text style={styles.to}>{item.receiverInfo.name}</Text>
-      </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.from}>{item.senderInfo.address}</Text>
-        <Text style={styles.toLabel}>To</Text>
-        <Text style={styles.to}>{item.receiverInfo.address}</Text>
-      </View>
-      <Text style={styles.info}>Shipment Type: {item.shipmentType}</Text>
-      <Text style={styles.info}>Delivery Type: {item.deliveryType}</Text>
-      {userRole === "sender" &&(
-        <View>
-          <Text style={styles.info}>Pick Up Date: {item.pickupDate}</Text>
-          <Text style={styles.info}>Pick Up Time: {item.pickupTime}</Text>
-          <Text style={styles.info}>Message: {item.message}</Text>
-        </View>
-      )}
-      <Text style={styles.status}>{item.status}</Text>
-      <ScrollView>
-        {/* <View style={styles.dayActivity}>
-          <Text style={styles.dayActivityTitle}>
-            30/6/2024
-          </Text>
-          <View style={styles.activity}>
-            <Text style={styles.activityTitle}>
-              Hanoi 8:43AM
-            </Text>
-            <Text style={styles.activityDetail}>
-              Processed at warehouse
-            </Text>
-          </View>
-          <View style={styles.activity}>
-            <Text style={styles.activityTitle}>
-              Hanoi 8:43AM
-            </Text>
-            <Text style={styles.activityDetail}>
-              Processed at warehouse
-            </Text>
-          </View>
-        </View>
-        <View style={styles.dayActivity}>
-          <Text style={styles.dayActivityTitle}>
-            30/6/2024
-          </Text>
-          <View style={styles.activity}>
-            <Text style={styles.activityTitle}>
-              Hanoi 8:43AM
-            </Text>
-            <Text style={styles.activityDetail}>
-              Processed at warehouse
-            </Text>
-          </View>
-          <View style={styles.activity}>
-            <Text style={styles.activityTitle}>
-              Hanoi 8:43AM
-            </Text>
-            <Text style={styles.activityDetail}>
-              Processed at warehouse
-            </Text>
-          </View>
-        </View> */}
-      </ScrollView>
-    </View>
-  );
+const OrderDetailScreen = ({navigation, route}) => {
+    const [selectedTab, setSelectedTab] = useState('sender');
+    const {order, role} = route.params;
+    return (
+        <ScrollView style={styles.container}>
+            <View style={styles.tabsContainer}>
+                <View style={styles.tabContainer}>
+                    <Button
+                        title='Sender'
+                        onPress={()=>{setSelectedTab('sender')}}
+                        buttonStyle={[styles.tabTopLeft, selectedTab === 'sender' ? styles.activeTab : styles.inactiveTab]}/>
+                </View>
+                <View style={styles.tabContainer}>
+                    <Button
+                        title='Receiver'
+                        onPress={()=>{setSelectedTab('receiver')}}
+                        buttonStyle={[styles.tabTopRight, selectedTab === 'receiver' ? styles.activeTab : styles.inactiveTab]}/>
+                </View>
+                
+            </View>
+            <View style={styles.tabsContainer}>
+                <View style={styles.tabContainer}>
+                    <Button
+                        title='Delivery'
+                        onPress={()=>{setSelectedTab('delivery')}}
+                        buttonStyle={[styles.tabBottomLeft, selectedTab === 'delivery' ? styles.activeTab : styles.inactiveTab]}/>
+                </View>
+                <View style={styles.tabContainer}>
+                    <Button
+                        title='Payment'
+                        onPress={()=>{setSelectedTab('payment')}}
+                        buttonStyle={[styles.tabBottomRight, selectedTab === 'payment' ? styles.activeTab : styles.inactiveTab]}/>
+                </View>
+            </View>
+            <View style={styles.infoContainer}>
+                <Text 
+                    style={styles.textId}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}>
+                    #{order._id}
+                </Text>
+                {selectedTab === 'sender' && (
+                    <View>
+                        <Text style={styles.textInfo}>
+                            Sender name: {order.senderInfo.name}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Sender address: {order.senderInfo.address}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Sender phone number: {order.senderInfo.phoneNumber}
+                        </Text>
+                    </View>
+                )}
+                {selectedTab === 'receiver' && (
+                    <View>
+                        <Text style={styles.textInfo}>
+                            Receiver name: {order.receiverInfo.name}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Receiver address: {order.receiverInfo.address}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Receiver phone number: {order.receiverInfo.phoneNumber}
+                        </Text>
+                    </View>
+                )}
+                {selectedTab === 'delivery' && (
+                    <View>
+                        <Text style={styles.textInfo}>
+                            Shipment type: {order.deliveryInfo.shipmentType}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Delivery type: {order.deliveryInfo.deliveryType}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Package size: {order.deliveryInfo.packageSize} kg
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Value: ${order.deliveryInfo.value}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Status: {order.deliveryInfo.status}
+                        </Text>
+                    </View>
+                )}
+                {selectedTab === 'payment' && (
+                    <View>
+                        <Text style={styles.textInfo}>
+                            Pay with: {order.payWith}
+                        </Text>
+                        <Text style={styles.textInfo}>
+                            Status: {order.payStatus}
+                        </Text>
+                    </View>
+                )}
+            </View>
+            {role === 'send' && 
+            order.payWith !== 'wallet' && 
+            (order.deliveryInfo.status === 'pending' || order.deliveryInfo.status === 'failed') &&
+            (
+                <View style={styles.qrContainer}>
+                    {order.payWith === 'momo' && (
+                        <>
+                            {order.payStatus === 'pending' && (
+                                <>
+                                    <Text style={{width: '100%', textAlign: 'center',}}>
+                                        This order has not been paid yet.
+                                    </Text>
+                                    <Button2
+                                        title={'Pay Now'}
+                                        onPressEvent={() => {navigation.navigate('Payment', ({order: order, payResult: 'pending'}));}}
+                                        customStyle={{marginTop: 10,}}/>
+                                </>
+                            )}
+                            {order.payStatus === 'success' && (
+                                <>
+                                    <QRCode
+                                        value={JSON.stringify({orderId: order._id, deliveryStatus: order.deliveryInfo.status})}
+                                        size={300}/>
+                                    {order.deliveryInfo.status === 'pending' && (
+                                        <Text style={{paddingVertical: 10, textAlign: 'center'}}>
+                                        Show this QR code to carrier before delivery.
+                                        </Text>
+                                    )}
+                                    {order.deliveryInfo.status === 'failed' && (
+                                        <Text style={{paddingVertical: 10, textAlign: 'center'}}>
+                                        Show this QR code to carrier after taking back your order.
+                                        </Text>
+                                    )}
+                                </>
+                            )}
+                        </>
+                    )}
+                    {order.payWith === 'cash' && (
+                        <>
+                            {order.payStatus === 'pending' && (
+                                <Text style={{paddingVertical: 10, textAlign: 'center'}}>
+                                    Pay cash to the carrier before delivery.
+                                </Text>
+                            )}
+                            <QRCode
+                                value={JSON.stringify({orderId: order._id, deliveryStatus: order.deliveryInfo.status})}
+                                size={300}/>
+                            {order.deliveryInfo.status === 'pending' && (
+                                <Text style={{paddingVertical: 10, textAlign: 'center'}}>
+                                    Show this QR code to carrier before delivery.
+                                </Text>
+                            )}
+                            {order.deliveryInfo.status === 'failed' && (
+                                <Text style={{paddingVertical: 10, textAlign: 'center'}}>
+                                    Show this QR code to carrier after taking back your order.
+                                </Text>
+                            )}
+                        </>
+                    )}
+                </View>
+            )}
+        </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  trackingId: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  trackingId: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
-    marginBottom: 20,
-  },
-  status: {
-    fontSize: 13,
-    color: '#77C795',
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  from: {
-    fontSize: 13,
-    width: '45%',
-    textAlign: 'left',
-  },
-  to: {
-    fontSize: 13,
-    width: '45%',
-    textAlign: 'right',
-  },
-  toLabel: {
-    fontSize: 13,
-    width: '10%'
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    marginHorizontal: 10,
-    marginBottom: 20,
-  },
-  info: {
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  activity: {
-    marginHorizontal: 20,
-    marginVertical: 10,
-  },
-  activityTitle: {
-    fontSize: 13,
-    marginBottom: 5,
-    fontStyle: 'italic'
-  },
-  activityDetail: {
-    fontSize: 13,
-  },
-  dayActivity: {
-    marginHorizontal: 20,
-  },
-  dayActivityTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+    container: {
+        flex: 1,
+        padding: 20,
+    },
+    tabsContainer: {
+        flexDirection: 'row',
+        width: '90%',
+        alignSelf: 'center',
+    },
+    tabContainer: {
+        width: '50%',
+    },
+    tabTopLeft: {
+        borderTopLeftRadius: 20,
+    },
+    tabTopRight: {
+        borderTopRightRadius: 20,
+    },
+    tabBottomLeft: {
+        borderBottomLeftRadius: 20,
+    },
+    tabBottomRight: {
+        borderBottomRightRadius: 20,
+    },
+    inactiveTab: {
+        backgroundColor: '#c0c0c0'
+    },
+    activeTab: {
+        
+    },
+    infoContainer: {
+        width: '100%',
+        padding: 10,
+        marginVertical: 20,
+        backgroundColor: '#ffffff',
+        borderRadius: 20,
+    },
+    textId: {
+        fontSize: 18,
+        color: '#1ed102',
+        textAlign: 'center',
+    },
+    textInfo: {
+        fontSize: 13,
+        paddingVertical: 10,
+    },
+    qrContainer: {
+        padding: 10,
+        backgroundColor: '#ffffff',
+        borderRadius: 20,
+        
+        width: '100%',
+    },
 });
 
 export default OrderDetailScreen;

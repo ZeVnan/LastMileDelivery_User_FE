@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "senderreceiver",
+    "name": "Client",
     "slug": "snack-a74203e5-a36f-4673-904a-d7cd3f347298",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,25 +12,38 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "scheme": "clientapp",
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bcluc.snacka74203e5a36f4673904ad7cd3f347298"
+      "bundleIdentifier": "com.LMD.Client"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.bcluc.snacka74203e5a36f4673904ad7cd3f347298",
-      "googleServicesFile": "./android/app/google-services.json"
+      "package": "com.LMD.Client"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "339e13c6-b3b8-431b-835a-a3022ebf6bf1"
-      }
-    }
+        "projectId": "6f6fe06c-3718-4323-9090-39aad0e69b1b"
+      },
+      "oneSignalAppId": "9aea25d1-efcd-4578-9fad-ffeb401ae64e"
+    },
+    "plugins": [
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "development"
+        }
+      ]
+    ]
   }
 }

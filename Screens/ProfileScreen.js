@@ -1,51 +1,48 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
+import { View, Text, StyleSheet } from 'react-native';
+import { Icon } from 'react-native-elements';
+import { Button2 } from '../CommonComponents/Button';
+import { OneSignal } from 'react-native-onesignal';
 
-const ProfileScreen = ({onLogout}) => {
+const ProfileScreen = ({navigation, route}) => {
+    const {userName} = route.params;
   return (
     <View style={styles.container}>
-      <View style={styles.userInfo}>
-        {/*<Image source={require('../assets/profile.jpg')} style={styles.avatar} />*/}
-        <Text style={styles.name}>Johnson Smith</Text>
-        <Text style={styles.email}>johnson@gmail.com</Text>
-      </View>
-      <View style={styles.actions}>
-        <Button title="Edit Profile" type="outline" onPress={() => {}} />
-        <Button title="Change Password" type="outline" onPress={() => {}} />
-      </View>
-      <Button title="Logout" onPress={onLogout} />
+        <View style={styles.infoContainer}>
+            <Text style={styles.name}>{userName}</Text>
+            <Icon
+                name='person'
+                type='material'
+                size={100}
+                color='#808080'/>
+        </View>
+        <View style={styles.actionsContainer}>
+            {/* <Button title="Edit Profile" type="outline" onPress={() => {}} />
+            <Button title="Change Password" type="outline" onPress={() => {}} /> */}
+        </View>
+        <Button2 
+            title="Log Out" 
+            onPressEvent={() => {navigation.navigate('Login'); OneSignal.logout();}}/>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
-  },
-  userInfo: {
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  email: {
-    fontSize: 16,
-  },
-  actions: {
-    marginTop: 20,
-    flex: 1,
-    justifyContent: 'center',
-  },
+    container: {
+        flex: 1,
+        padding: 20,
+    },
+    infoContainer: {
+        alignItems: 'center',
+    },
+    actionsContainer: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    name: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
 });
 
 export default ProfileScreen;

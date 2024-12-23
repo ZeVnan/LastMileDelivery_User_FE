@@ -1,81 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import * as Notifications from 'expo-notifications';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, FlatList, StyleSheet, Alert } from 'react-native';
+import { Button } from 'react-native-elements';
 import { NotiCard } from '../CommonComponents/Card';
+import { UserContext } from '../Utilities/UserContext';
 
 const NotificationScreen = () => {
-    const [notifications, setNotifications] = useState([]);
+    const [sendNotifications, setSendNotifications] = useState([]);
+    const [receiveNotifications, setReceiveNotifications] = useState([]);
+    const [selectedTab, setSelectedTab] = useState("send");
+    const { userId } = useContext(UserContext);
 
-    // useEffect(() => {
-    //   const subscription = Notifications.addListener(handleNotification);
-    //   return () => subscription.remove();
-    // }, []);
+    const getNotification = async(userId, type) => {
+        try {
+            if (type === 'send'){
+                const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/notifications/senderId?senderId=${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (response.ok){
+                    const result = await response.json();
+                    setSendNotifications(result.data);
+                }
+                else{
+                    Alert.alert('Error', `${response.status}`);
+                }
+            }
+            else{
+                const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/notifications/receiverId?receiverId=${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (response.ok){
+                    const result = await response.json();
+                    setReceiveNotifications(result.data);
+                }
+                else{
+                    Alert.alert('Error', `${response.status}`);
+                }
+            }
+        }
+        catch(error){
+            Alert.alert('Error', `${error.message}`);
+        }
+    }
+    useEffect(() => {getNotification(userId, 'send')}, []);
+    useEffect(() => {getNotification(userId, 'receive')}, []);
 
-    const handleNotification = (notification) => {
-        setNotifications((prevNotifications) => [notification, ...prevNotifications]);
-    };
+    const filteredReceiveNotifications = receiveNotifications.filter(item => 
+        (item.about === 'delivery' && item.status !== 'canceled') ||
+        (item.about !== 'payment')
+    )
 
-    const fakeNotifications = [
-        {
-            _id: '0',
-            orderId: '39f93f',
-            status: 'pending',
-            date: '2024-12-20',
-            send: true,
-        },
-        {
-            _id: '1',
-            orderId: '8fj3k2',
-            status: 'inProgress',
-            date: '2024-12-8',
-            send: false,
-        },
-        {
-            _id: '2',
-            orderId: '92n4f',
-            status: 'completed',
-            date: '2024-11-30',
-            send: true,
-        },
-        {
-            _id: '3',
-            orderId: '0fn2n4',
-            status: 'pending',
-            date: '2024-11-26',
-            send: false,
-        },
-        {
-            _id: '4',
-            orderId: '2mc81g',
-            status: 'inProgress',
-            date: '2024-11-20',
-            send: true,
-        },
-        {
-            _id: '5',
-            orderId: '1mk3n5',
-            status: 'completed',
-            date: '2024-11-15',
-            send: false,
-        },
-    ]
-
-    const renderItem = ({item}) => (
+    const renderSendItem = ({item}) => (
         <View style={styles.notification}>
             <NotiCard
                 orderId={item.orderId}
+                about={item.about}
                 status={item.status}
                 date={item.date}
-                send={item.send}/>
+                send={true}/>
+        </View>
+    )
+    const renderReceiveItem = ({item}) => (
+        <View style={styles.notification}>
+            <NotiCard
+                orderId={item.orderId}
+                about={item.about}
+                status={item.status}
+                date={item.date}
+                send={false}/>
         </View>
     )
 
     return (
         <View style={styles.container}>
+            <View style={styles.tabsContainer}>
+                <View style={styles.tabContainer}>
+                    <Button
+                        title="Send"
+                        onPress={() => {setSelectedTab('send')}}
+                        buttonStyle={[styles.tabLeft, selectedTab === 'send' ? styles.activeTab : styles.inactiveTab]}
+                    />
+                </View>
+                <View style={styles.tabContainer}>
+                <Button
+                    title="Receive"
+                    onPress={() => {setSelectedTab('receive')}}
+                    buttonStyle={[styles.tabRight, selectedTab === 'receive' ? styles.activeTab : styles.inactiveTab]}
+                />
+                </View>
+            </View>
             <FlatList
-                data={fakeNotifications}
-                renderItem={renderItem}
-                keyExtractor={(item) => item._id}/>
+                    data={selectedTab === 'send' ? sendNotifications : filteredReceiveNotifications}
+                    renderItem={selectedTab === 'send' ? renderSendItem : renderReceiveItem}
+                    keyExtractor={(item) => item._id}/>
         </View>
     );
 };
@@ -87,6 +109,29 @@ const styles = StyleSheet.create({
     notification: {
         width: '100%',
         marginVertical: 5,
+    },
+    tabsContainer: {
+        flexDirection: 'row',
+        marginVertical: 10,
+        width: '90%',
+        alignSelf: 'center',
+      },
+    tabContainer: {
+        width: '50%',
+    },
+    tabLeft: {
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+      },
+    tabRight: {
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20,
+    },
+    inactiveTab: {
+        backgroundColor: '#c0c0c0'
+    },
+    activeTab: {
+
     },
 })
 

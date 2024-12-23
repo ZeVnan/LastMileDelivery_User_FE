@@ -1,47 +1,47 @@
 import React, { useContext } from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
+import { StyleSheet, View, FlatList, Text, ImageBackground } from 'react-native';
 import { UserContext } from '../Utilities/UserContext';
 import { Button0 } from '../CommonComponents/Button';
 
 const HomeScreen = ({navigation}) => {
-  const { userRole } = useContext(UserContext);
+  const { userName } = useContext(UserContext);
 
   const data = [
     { 
         id: '0', 
+        title: 'Profile', 
+        iconText: 'account-circle', 
+        onPressEvent: () => navigation.navigate('Profile', {userName: userName}) 
+    },
+    { 
+        id: '2', 
+        title: 'Notification', 
+        iconText: 'notifications', 
+        onPressEvent: () => navigation.navigate('Notification') 
+    },
+    { 
+        id: '3', 
         title: 'Order History', 
         iconText: 'list', 
         onPressEvent: () => navigation.navigate('Order History') 
     },
     { 
-        id: '1', 
-        title: 'Profile', 
-        iconText: 'account-circle', 
-        onPressEvent: () => navigation.navigate('Profile') 
-    },
-    { 
-        id: '2', 
+        id: '4', 
         title: 'Send Package', 
         iconText: 'local-shipping', 
         onPressEvent: () => navigation.navigate('Sender Infomation') 
     },
-    { 
-        id: '3', 
-        title: 'Help with packaging', 
-        iconText: 'help', 
-        onPressEvent: () => navigation.navigate('Chat') 
-    },
     // { 
-    //   id: '4', 
-    //   title: 'Delivery Screen', 
-    //   iconText: 'inventory', 
-    //   onPressEvent: () => navigation.navigate('Delivery Information') 
+    //     id: '5', 
+    //     title: 'Help with packaging', 
+    //     iconText: 'question-answer', 
+    //     onPressEvent: () => navigation.navigate('Chat') 
     // },
     // { 
-    //   id: '5', 
-    //   title: 'Check Out Screen', 
-    //   iconText: 'payments', 
-    //   onPressEvent: () => navigation.navigate('CheckOut') 
+    //     id: '6', 
+    //     title: 'Order detail sample', 
+    //     iconText: 'info', 
+    //     onPressEvent: () => navigation.navigate('Order Detail') 
     // },
   ];
 
@@ -58,13 +58,24 @@ const HomeScreen = ({navigation}) => {
   };
 
   return (
-    <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.container}
-        numColumns={2}
-    />
+    <View style={styles.container}>
+        <View style={styles.imageContainer}>
+            <ImageBackground
+                source={require('../assets/plain.jpg')}
+                style={styles.image}
+                imageStyle={styles.imageContent}>
+                <Text style={styles.helloText}>
+                    Hello {userName} !
+                </Text>
+            </ImageBackground>
+        </View>
+        <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.buttonContainer}
+            numColumns={2}/>
+    </View>
   );
 };
 
@@ -73,10 +84,29 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
     },
+    buttonContainer: {
+        width: '100%',
+        marginTop: 20,
+    },
     itemContainer:{
         width: '50%',
         paddingVertical: 20,
     },
+    helloText: {
+        fontSize: 20,
+        fontWeight: '500',
+        margin: 15,
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+    },
+    imageContainer: {
+        height: '25%',
+    },
+    imageContent: {
+        borderRadius: 15,
+    }
 });
 
 export default HomeScreen;

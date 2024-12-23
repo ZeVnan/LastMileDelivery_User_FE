@@ -10,36 +10,32 @@ const OrderHistoryScreen = ({navigation}) => {
   const [selectedTab, setSelectedTab] = useState("send");
   const { userId } = useContext(UserContext);
 
-  const handleTabChange = (newTab) => {
-    setSelectedTab(newTab);
-  };
+  useEffect(() => {getOrder(userId, "send")}, []);
+  useEffect(() => {getOrder(userId, "receive")}, []);
 
-  // useEffect(getOrder(userId, "send"), []);
-  // useEffect(getOrder(userId, "receive"), []);
-
-  const getOrder = async(userId, status) => {
+  const getOrder = async(userId, type) => {
     try{
-      const response = await fetch('https://waseminarcnpm2.azurewebsites.net/getOrderByUserIdAndStatus', {
+      const response = await fetch('https://waseminarcnpm2.azurewebsites.net/getOrderByUserIdAndType', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, status }),
+        body: JSON.stringify({ userId, type }),
       });
       if (response.ok){
         const result = await response.json();
-        if (status === "send"){
+        if (type === "send"){
           setSendOrders(result.orders)
         }
-        else if (status === "receive"){
+        else if (type === "receive"){
           setReceiveOrder(result.orders)
         }
       }
       else{
-        if (status === "send"){
+        if (type === "send"){
           Alert.alert("Error", "Cannot load send orders")
         }
-        else if (status === "receive"){
+        else if (type === "receive"){
           Alert.alert("Error", "Cannot load receive orders")
         }
       }
@@ -48,49 +44,18 @@ const OrderHistoryScreen = ({navigation}) => {
       Alert.alert("Error", "Something went wrong")
     }
   }
-  const fakeSendOrders = [
-    {
-      _id: '0',
-      senderName: 'Crimson Typhoon',
-      receiverName: 'Striker Eureka',
-      value: '10',
-      status: 'Pending',
-    },
-    {
-      _id: '1',
-      senderName: 'Crimson Typhoon',
-      receiverName: 'Vulcan Specter',
-      value: '20',
-      status: 'Completed',
-    },
-  ];
-  const fakeReceiveOrders = [
-    {
-      _id: '0',
-      senderName: 'Gipsy Danger',
-      receiverName: 'Cherno Alpha',
-      value: '10',
-      status: 'Completed',
-    },
-    {
-      _id: '1',
-      senderName: 'Saber Athena',
-      receiverName: 'Titan Redeemer',
-      value: '20',
-      status: 'In progress',
-    },
-  ];
 
   const renderItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.order}
-      onPress={() => {}}>
+      onPress={() => navigation.navigate('Order Detail', {order: item, role: selectedTab})}>
       <OrderCard
         id = {item._id}
-        senderName={item.senderName}
-        receiverName={item.receiverName}
-        value={item.value}
-        status={item.status}/>
+        senderName={item.senderInfo.name}
+        receiverName={item.receiverInfo.name}
+        value={item.deliveryInfo.value}
+        deliveryStatus={item.deliveryInfo.status}
+        paymentStatus={item.payStatus}/>
     </TouchableOpacity>
   );
 
@@ -100,33 +65,24 @@ const OrderHistoryScreen = ({navigation}) => {
         <View style={styles.tabContainer}>
           <Button
             title="Send"
-            onPress={() => handleTabChange('send')}
+            onPress={() => {setSelectedTab('send')}}
             buttonStyle={[styles.tabLeft, selectedTab === 'send' ? styles.activeTab : styles.inactiveTab]}
           />
         </View>
         <View style={styles.tabContainer}>
           <Button
             title="Receive"
-            onPress={() => handleTabChange('receive')}
+            onPress={() => {setSelectedTab('receive')}}
             buttonStyle={[styles.tabRight, selectedTab === 'receive' ? styles.activeTab : styles.inactiveTab]}
           />
         </View>
         
       </View>
-      {selectedTab === 'send' && (
-        <FlatList
-          data={fakeSendOrders}
-          renderItem={renderItem}
-          keyExtractor={item => item._id}
-        />
-      )}
-      {selectedTab === 'receive' && (
-        <FlatList
-          data={fakeReceiveOrders}
-          renderItem={renderItem}
-          keyExtractor={item => item._id}
-        />
-      )}
+      <FlatList
+        data={selectedTab == 'send' ? sendOrders : receiveOrders}
+        renderItem={renderItem}
+        keyExtractor={item => item._id}
+      />
     </View>
   );
 };
@@ -138,7 +94,7 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: 'row',
-    marginVertical: 20,
+    marginVertical: 10,
     width: '90%',
     alignSelf: 'center',
   },

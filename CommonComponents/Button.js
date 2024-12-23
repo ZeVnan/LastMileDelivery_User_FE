@@ -37,12 +37,21 @@ export const Button1 = ({iconText, onPressEvent}) => {
         </View>
     );
 }
-export const Button2 = ({title, onPressEvent}) => {
+export const Button2 = ({title, onPressEvent, customStyle}) => {
     return(
         <Button
             title={title}
-            buttonStyle={styles.button2}
+            buttonStyle={[styles.button2, customStyle]}
             onPress={onPressEvent}/> 
+    );
+}
+export const Button3 = ({title, onPressEvent, customStyle}) => {
+    return(
+        <Button
+            title={title}
+            buttonStyle={[styles.button3, customStyle]}
+            onPress={onPressEvent}
+            type='outline'/>
     );
 }
 
@@ -53,7 +62,7 @@ const styles = StyleSheet.create({
     button0: {
         width: 70,
         height: 70,
-        borderRadius: 35,
+        borderRadius: 25,
     },
     button1:{
         width: 50,
@@ -65,6 +74,12 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 20,
         width: '100%',
+    },
+    button3: {
+        height: 50,
+        borderRadius: 20,
+        width: '100%',
+        borderWidth: 2,
     },
     text: {
         fontSize: 12,

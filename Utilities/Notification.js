@@ -1,87 +1,57 @@
-import { useState, useEffect, useRef } from "react";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-
-import Constants from "expo-constants";
-import { Platform } from "react-native";
-
-export const usePushNotifications = () => {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldPlaySound: false,
-      shouldShowAlert: true,
-      shouldSetBadge: false,
-    }),
-  });
-
-  const [expoPushToken, setExpoPushToken] = useState();
-  const [notification, setNotification] = useState();
-
-  const notificationListener = useRef();
-  const responseListener = useRef();
-
-  async function registerForPushNotificationsAsync() {
-    let token;
-    if (Device.isDevice) {
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
+import React from "react";
+import { Alert } from "react-native";
+export const createNotification = async (order, about, status, token) => {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+  const day = currentDate.getDate().toString().padStart(2, "0");
+  const formattedDate = `${year}-${month}-${day}`;
+  try {
+    await fetch(
+      `https://waseminarcnpm2.azurewebsites.net/protected/notification`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          orderId: order._id,
+          senderId: order.senderInfo.userId,
+          receiverId: order.receiverInfo.userId,
+          date: formattedDate,
+          about: about,
+          status: status,
+        }),
       }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification");
-        return;
-      }
-
-      token = await Notifications.getExpoPushTokenAsync({
-        projectId: Constants.expoConfig?.extra?.eas.projectId,
-      });
-      log.info(token);
-    } else {
-      alert("Must be using a physical device for Push notifications");
-    }
-
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-
-    return token;
+    );
+  } catch (error) {
+    Alert.alert("Create Notification Error", `${error.message}`);
   }
-
-  useEffect(() => {
-    registerForPushNotificationsAsync().then((token) => {
-      setExpoPushToken(token);
-    });
-
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
-
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
-
-    return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
-
-  return {
-    expoPushToken,
-    notification,
-  };
+};
+export const pushNotification = async (userId, title, message, token) => {
+  console.log(userId);
+  console.log(message);
+  console.log(title);
+  try {
+    const response = await fetch(
+      `https://waseminarcnpm2.azurewebsites.net/protected/one-signal/send-push-notification`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: userId,
+          contentEn: message,
+          headingEn: title,
+          subtitleEn: "-",
+        }),
+      }
+    );
+    console.log(`${response.status}`);
+  } catch (error) {
+    Alert.alert("Push notification error", `${error.message}`);
+  }
 };
