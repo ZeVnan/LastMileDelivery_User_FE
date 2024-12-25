@@ -28,9 +28,9 @@ export const createNotification = async(order, about, status, token) => {
     }
 }
 export const pushNotification = async(userId, title, message, token) => {
-    console.log(userId);
-    console.log(message);
-    console.log(title);
+    // console.log(userId);
+    // console.log(message);
+    // console.log(title);
     try {
         const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/one-signal/send-push-notification`, {
             method: 'POST',
@@ -45,7 +45,7 @@ export const pushNotification = async(userId, title, message, token) => {
                 subtitleEn: '-'
             }),
         });
-        console.log(`${response.status}`);
+        //console.log(`${response.status}`);
     }
     catch (error){
         Alert.alert("Push notification error", `${error.message}`)

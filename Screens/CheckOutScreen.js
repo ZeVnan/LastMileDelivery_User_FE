@@ -23,6 +23,29 @@ const CheckOutScreen = ({navigation, route}) => {
     const month = (deliveryInfo.pickupDate.getMonth() + 1).toString().padStart(2, '0');
     const day = deliveryInfo.pickupDate.getDate().toString().padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
+    let nearestHubId = '';
+    try {
+      const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/hub/near?address=${senderInfo.address}`,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok){
+        Alert.alert("Error", `${response.status}`);
+        return;
+      }
+      else{
+        const result = await response.json();
+        console.log(`${result._id}`)
+        nearestHubId = result._id;
+      }
+    }
+    catch (error){
+      Alert.alert("Error", `${error.message}`);
+      return;
+    }
     try{
       const response = await fetch('https://waseminarcnpm2.azurewebsites.net/protected/confirmation', {
         method: 'POST',
@@ -52,7 +75,7 @@ const CheckOutScreen = ({navigation, route}) => {
             pickupTime: formattedTime,
             value: deliveryInfo.value,
           },
-          hudId: "",
+          hudId: nearestHubId,
           message: receiverInfo.message === "" ? "-" : receiverInfo.message,
           payStatus: 'pending',
           payWith: selectedPayType,
@@ -114,7 +137,7 @@ const CheckOutScreen = ({navigation, route}) => {
   const [payTypeItems, setPayTypeItems] = useState([
       { label: "Momo", value: "momo" },
       { label: "Cash", value: "cash" },
-      { label: "Wallet", value: "wallet" }
+      // { label: "Wallet", value: "wallet" }
   ]);
 
   return (
