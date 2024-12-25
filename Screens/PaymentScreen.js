@@ -66,7 +66,7 @@ const PaymentScreen = ({navigation, route}) => {
         //body: JSON.stringify({ amount }),
       });
       if (response.ok){
-        createNotification(order, 'payment', 'success', token);
+        await createNotification(order, 'payment', 'success', token);
       }
       else{
         Alert.alert("Error", `${response.status}`);

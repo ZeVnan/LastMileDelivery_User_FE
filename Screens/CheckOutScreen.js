@@ -10,20 +10,7 @@ const CheckOutScreen = ({navigation, route}) => {
   const {senderInfo, receiverInfo, deliveryInfo} = route.params;
   const { token } = useContext(UserContext);
   
-  const handleCheckout = async () => {
-    if (selectedPayType === ''){
-      Alert.alert("Missing Payment Method");
-      return;
-    }
-    const hours = deliveryInfo.pickupTime.getHours().toString().padStart(2, '0');
-    const minutes = deliveryInfo.pickupTime.getMinutes().toString().padStart(2, '0');
-    const formattedTime = `${hours}:${minutes}`;
-    
-    const year = deliveryInfo.pickupDate.getFullYear();
-    const month = (deliveryInfo.pickupDate.getMonth() + 1).toString().padStart(2, '0');
-    const day = deliveryInfo.pickupDate.getDate().toString().padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
-    let nearestHubId = '-';
+  const getHubId = async() => {
     try {
       const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/hub/near?address=${senderInfo.address}`,{
         method: 'GET',
@@ -38,13 +25,31 @@ const CheckOutScreen = ({navigation, route}) => {
       }
       else{
         const result = await response.json();
-        nearestHubId = result._id;
+        return result._id;
       }
     }
     catch (error){
       Alert.alert("Error", error.message);
       return;
     }
+  }
+  const handleCheckout = async () => {
+    let nearestHubId = await getHubId();
+    if (selectedPayType === ''){
+      Alert.alert("Missing information", "Payment Method is missing");
+      return;
+    }
+    if (!nearestHubId){
+      Alert.alert("Error", `Error while finding hubid`);
+    }
+    const hours = deliveryInfo.pickupTime.getHours().toString().padStart(2, '0');
+    const minutes = deliveryInfo.pickupTime.getMinutes().toString().padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}`;
+    
+    const year = deliveryInfo.pickupDate.getFullYear();
+    const month = (deliveryInfo.pickupDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = deliveryInfo.pickupDate.getDate().toString().padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
     try{
       const response = await fetch('https://waseminarcnpm2.azurewebsites.net/protected/confirmation', {
         method: 'POST',
@@ -74,7 +79,7 @@ const CheckOutScreen = ({navigation, route}) => {
             pickupTime: formattedTime,
             value: deliveryInfo.value,
           },
-          hudId: nearestHubId,
+          hubId: nearestHubId,
           message: receiverInfo.message === "" ? "-" : receiverInfo.message,
           payStatus: 'pending',
           payWith: selectedPayType,
@@ -82,38 +87,39 @@ const CheckOutScreen = ({navigation, route}) => {
       });
       if (response.status === 200 || response.status === 201){
         const result = await response.json();
-        if (selectedPayType === 'momo'){
-          const order = result["order##"]
-          createNotification(order, 'delivery', 'pending', token);
-          createNotification(order, 'payment', 'pending', token);
-          pushNotification(
+        const order = result["order##"]
+          await createNotification(order, 'delivery', 'pending', token);
+          await createNotification(order, 'payment', 'pending', token);
+          await pushNotification(
             order.senderInfo.userId,
             `Order #${order._id} has an delivery update.`,
             `The order has been created.`,
             token);
-          pushNotification(
+          await pushNotification(
             order.senderInfo.userId,
             `Order #${order._id} has an payment update.`,
             `The order is awaiting payment.`, 
             token);
-          pushNotification(
+          await pushNotification(
             order.receiverInfo.userId,
             `Order #${order._id} has an delivery update.`,
             `The order is being prepared.`,
             token);
-          navigation.navigate('Payment', ({order: order, payResult: 'pending'}));
-        }
-        else {
-          navigation.navigate('Home');
-        }
+          if (selectedPayType === 'momo'){
+            navigation.navigate('Payment', ({order: order, payResult: 'pending'}));
+          }
+          else{
+            navigation.navigate('Home');
+          }
       }
       else{
-        //Alert.alert("Error",`${response.status}`);
-        console.log(response.json())
+        // const result = await response.json();
+        // console.log(result)
+        Alert.alert("Error",`${response.status}`);
       }
     }
     catch(error){
-      Alert.alert("Error", `Catch ${error}`);
+      Alert.alert("Error", `${error.message}`);
     }
   };
   const shippingFees = {
