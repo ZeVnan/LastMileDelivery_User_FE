@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Linking, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 import QRCode from 'react-native-qrcode-svg'
 import { Button2 } from '../CommonComponents/Button';
@@ -7,6 +7,33 @@ import { Button2 } from '../CommonComponents/Button';
 const OrderDetailScreen = ({navigation, route}) => {
     const [selectedTab, setSelectedTab] = useState('sender');
     const {order, role} = route.params;
+    const cancelOrder = async() => {
+        let newStatus = '';
+        if (order.deliveryInfo.status === 'pending'){
+            newStatus = 'canceled';
+        }
+        if (order.deliveryInfo.status === 'inProgress'){
+            newStatus = 'failed';
+        }
+        try{
+            const response = await fetch('https://waseminarcnpm2.azurewebsites.net/protected/order/updateDeliveryStatus', {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId: order._id, newStatus: newStatus }),
+            });
+            if(response.ok){
+                navigation.navigate('Order History')
+            }
+            else{
+                Alert.alert("Error", `${response.status}`)
+            }
+        }
+        catch (error){
+            Alert.alert("Error", `${error.message}`);
+        }
+    }
     return (
         <ScrollView style={styles.container}>
             <View style={styles.tabsContainer}>
@@ -160,6 +187,16 @@ const OrderDetailScreen = ({navigation, route}) => {
                             )}
                         </>
                     )}
+                </View>
+            )}
+            {role === 'receive' && 
+            (order.deliveryInfo.status === 'pending' || 
+            order.deliveryInfo.status === 'inProgress') &&(
+                <View style={styles.qrContainer}>
+                    <Button2
+                        title={'Cancel this order'}
+                        onPressEvent={cancelOrder}
+                        customStyle={{marginTop: 10,}}/>
                 </View>
             )}
         </ScrollView>
