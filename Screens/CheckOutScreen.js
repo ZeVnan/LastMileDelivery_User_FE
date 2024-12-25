@@ -23,7 +23,7 @@ const CheckOutScreen = ({navigation, route}) => {
     const month = (deliveryInfo.pickupDate.getMonth() + 1).toString().padStart(2, '0');
     const day = deliveryInfo.pickupDate.getDate().toString().padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
-    let nearestHubId = '';
+    let nearestHubId = '-';
     try {
       const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/hub/near?address=${senderInfo.address}`,{
         method: 'GET',
@@ -38,12 +38,11 @@ const CheckOutScreen = ({navigation, route}) => {
       }
       else{
         const result = await response.json();
-        console.log(`${result._id}`)
         nearestHubId = result._id;
       }
     }
     catch (error){
-      Alert.alert("Error", `${error.message}`);
+      Alert.alert("Error", error.message);
       return;
     }
     try{
@@ -81,7 +80,7 @@ const CheckOutScreen = ({navigation, route}) => {
           payWith: selectedPayType,
         }),
       });
-      if (response.ok){
+      if (response.status === 200 || response.status === 201){
         const result = await response.json();
         if (selectedPayType === 'momo'){
           const order = result["order##"]
@@ -109,12 +108,12 @@ const CheckOutScreen = ({navigation, route}) => {
         }
       }
       else{
-        const result = await response.json()
-        Alert.alert(result);
+        //Alert.alert("Error",`${response.status}`);
+        console.log(response.json())
       }
     }
     catch(error){
-      Alert.alert("Something went wrong");
+      Alert.alert("Error", `Catch ${error}`);
     }
   };
   const shippingFees = {
