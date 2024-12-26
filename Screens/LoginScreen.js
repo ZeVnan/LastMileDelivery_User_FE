@@ -36,8 +36,8 @@ const LoginScreen = ({navigation}) => {
         setToken(result.data.token);
         setUserName(username);
         if (result.data.role === "client"){
+          await OneSignal.login(result.data.id);
           navigation.navigate('Home');
-          OneSignal.login(result.data.id);
         }
       }
       else{

@@ -6,25 +6,29 @@ import { OneSignal } from 'react-native-onesignal';
 
 const ProfileScreen = ({navigation, route}) => {
     const {userName} = route.params;
-  return (
-    <View style={styles.container}>
-        <View style={styles.infoContainer}>
-            <Text style={styles.name}>{userName}</Text>
-            <Icon
-                name='person'
-                type='material'
-                size={100}
-                color='#808080'/>
+    const logOut = async() => {
+        await OneSignal.logout();
+        navigation.navigate('Login');
+    }
+    return (
+        <View style={styles.container}>
+            <View style={styles.infoContainer}>
+                <Text style={styles.name}>{userName}</Text>
+                <Icon
+                    name='person'
+                    type='material'
+                    size={100}
+                    color='#808080'/>
+            </View>
+            <View style={styles.actionsContainer}>
+                {/* <Button title="Edit Profile" type="outline" onPress={() => {}} />
+                <Button title="Change Password" type="outline" onPress={() => {}} /> */}
+            </View>
+            <Button2 
+                title="Log Out" 
+                onPressEvent={logOut}/>
         </View>
-        <View style={styles.actionsContainer}>
-            {/* <Button title="Edit Profile" type="outline" onPress={() => {}} />
-            <Button title="Change Password" type="outline" onPress={() => {}} /> */}
-        </View>
-        <Button2 
-            title="Log Out" 
-            onPressEvent={() => {navigation.navigate('Login'); OneSignal.logout();}}/>
-    </View>
-  );
+    );
 };
 
 const styles = StyleSheet.create({
