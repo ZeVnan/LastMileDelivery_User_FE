@@ -12,7 +12,7 @@ const CheckOutScreen = ({navigation, route}) => {
   
   const getHubId = async() => {
     try {
-      const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/hub/near?address=${senderInfo.address}`,{
+      const response = await fetch(`https://waseminarcnpm2.azurewebsites.net/protected/hub/near?address=${senderInfo.senderAddress}`,{
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -20,8 +20,7 @@ const CheckOutScreen = ({navigation, route}) => {
         },
       });
       if (!response.ok){
-        Alert.alert("Error", `${response.status}`);
-        return;
+        return '-';
       }
       else{
         const result = await response.json();
@@ -29,8 +28,7 @@ const CheckOutScreen = ({navigation, route}) => {
       }
     }
     catch (error){
-      Alert.alert("Error", error.message);
-      return;
+      return '-';
     }
   }
   const handleCheckout = async () => {
@@ -39,8 +37,9 @@ const CheckOutScreen = ({navigation, route}) => {
       Alert.alert("Missing information", "Payment Method is missing");
       return;
     }
-    if (!nearestHubId){
+    if (nearestHubId === '-'){
       Alert.alert("Error", `Error while finding hubid`);
+      return;
     }
     const hours = deliveryInfo.pickupTime.getHours().toString().padStart(2, '0');
     const minutes = deliveryInfo.pickupTime.getMinutes().toString().padStart(2, '0');
