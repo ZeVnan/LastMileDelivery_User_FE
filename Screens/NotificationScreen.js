@@ -21,7 +21,7 @@ const NotificationScreen = () => {
                 });
                 if (response.ok){
                     const result = await response.json();
-                    setSendNotifications(result.data);
+                    setSendNotifications(result.data.reverse());
                 }
                 else{
                     Alert.alert('Error', `${response.status}`);
@@ -36,7 +36,7 @@ const NotificationScreen = () => {
                 });
                 if (response.ok){
                     const result = await response.json();
-                    setReceiveNotifications(result.data);
+                    setReceiveNotifications(result.data.reverse());
                 }
                 else{
                     Alert.alert('Error', `${response.status}`);

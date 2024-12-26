@@ -25,10 +25,10 @@ const OrderHistoryScreen = ({navigation}) => {
       if (response.ok){
         const result = await response.json();
         if (type === "send"){
-          setSendOrders(result.orders)
+          setSendOrders(result.orders.reverse())
         }
         else if (type === "receive"){
-          setReceiveOrder(result.orders)
+          setReceiveOrder(result.orders.reverse())
         }
       }
       else{
