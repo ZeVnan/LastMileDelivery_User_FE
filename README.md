@@ -21,4 +21,6 @@ The application is built using **React Native Expo Managed Workflow** as the pri
   5. Use the Expo Go app to scan the QR code displayed in your terminal to launch the application.  
   6. (Optional) Run on a Native Environment:  
     Run npx expo run:android  
-    Run npx expo run:ios  
+    Run npx expo run:ios
+  7. (Optional) Build apk:
+    eas build -p android --profile preview (Remember to login with expo)
