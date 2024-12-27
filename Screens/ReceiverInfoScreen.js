@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import {stylesInput} from '../CommonComponents/Input'
 import { Button2 } from '../CommonComponents/Button'
+import { UserContext } from '../Utilities/UserContext';
 
 const ReceiverInfoScreen = ({navigation, route}) => {
   const [receiverUsername, setReceiverUsername] =useState("");
@@ -14,6 +15,7 @@ const ReceiverInfoScreen = ({navigation, route}) => {
     message: "",
   })
   const {senderInfo} = route.params;
+  const { userId } = useContext(UserContext);
 
   const apiKey = '1ac6150e984944cca2b8066620759a85';
   const [location, setLocation] = useState(null);
@@ -63,12 +65,16 @@ const ReceiverInfoScreen = ({navigation, route}) => {
       });
       if (response.ok){
         const result = await response.json();
-        setReceiverInfoForm({...receiverInfoForm, receiverId: result.userId})
-        return result.userId;
+        if (result.userId === userId){
+          Alert.alert("Invalid data", "Cannot send to the same client");
+        }
+        else{
+          setReceiverInfoForm({...receiverInfoForm, receiverId: result.userId})
+        }
       }
       else{
         setReceiverInfoForm({...receiverInfoForm, receiverId: ''})
-        return '';
+        Alert.alert("Missing data", "Receiver username is missing or not found");
       }
     }
     catch (error){
@@ -90,12 +96,7 @@ const ReceiverInfoScreen = ({navigation, route}) => {
       Alert.alert("Missing information", "Receiver address is missing");
       return;
     }
-    const userId = await getUserId();
-    if (userId === ''){
-      
-      Alert.alert("Missing data", "Receiver username is missing or not found");
-      return;
-    }
+    await getUserId();
   };
   useEffect(
     () => {

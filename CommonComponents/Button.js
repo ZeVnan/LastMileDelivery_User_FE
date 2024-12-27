@@ -37,12 +37,13 @@ export const Button1 = ({iconText, onPressEvent}) => {
         </View>
     );
 }
-export const Button2 = ({title, onPressEvent, customStyle}) => {
+export const Button2 = ({title, onPressEvent, customStyle, disabled}) => {
     return(
         <Button
             title={title}
             buttonStyle={[styles.button2, customStyle]}
-            onPress={onPressEvent}/> 
+            onPress={onPressEvent}
+            disabled={disabled}/> 
     );
 }
 export const Button3 = ({title, onPressEvent, customStyle}) => {

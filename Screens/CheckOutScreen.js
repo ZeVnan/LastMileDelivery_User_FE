@@ -9,6 +9,7 @@ import { createNotification, pushNotification } from '../Utilities/Notification'
 const CheckOutScreen = ({navigation, route}) => {
   const {senderInfo, receiverInfo, deliveryInfo} = route.params;
   const { token } = useContext(UserContext);
+  const [ creating, setCreating] = useState(false);
   
   const getHubId = async() => {
     try {
@@ -32,6 +33,7 @@ const CheckOutScreen = ({navigation, route}) => {
     }
   }
   const handleCheckout = async () => {
+    await setCreating(true);
     let nearestHubId = await getHubId();
     if (selectedPayType === ''){
       Alert.alert("Missing information", "Payment Method is missing");
@@ -193,7 +195,8 @@ const CheckOutScreen = ({navigation, route}) => {
               containerStyle={styles.dropDownPicker}/>
         <Button2 
           title={selectedPayType === 'momo' ? "Create Order And Pay" : "Create Order"}
-          onPressEvent={handleCheckout} />
+          onPressEvent={handleCheckout}
+          disabled={creating} />
       </View>
     </View>
   );
