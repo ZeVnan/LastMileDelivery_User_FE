@@ -17,6 +17,7 @@ import ProfileScreen from './Screens/ProfileScreen';
 import LoginScreen from './Screens/LoginScreen';
 import NotificationScreen from './Screens/NotificationScreen';
 import PaymentScreen from './Screens/PaymentScreen';
+import SignUpScreen from './Screens/SignUpScreen';
 import { UserProvider } from './Utilities/UserContext';
 
 const Stack = createNativeStackNavigator();
@@ -71,6 +72,10 @@ export default function App() {
               name="Payment"
               component={PaymentScreen}
               options={{headerShown: false}}/>
+            <Stack.Screen 
+              name="SignUp" 
+              component={SignUpScreen}
+              options={{headerShown: false}}/>
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaView>
@@ -79,7 +84,7 @@ export default function App() {
   return (
     <UserProvider>
       <SafeAreaView style={styles.container}>
-        <PaymentScreen/>
+        <LoginScreen/>
       </SafeAreaView>
     </UserProvider>
   );

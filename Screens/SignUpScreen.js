@@ -1,51 +1,42 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Alert, Image, Text, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-elements';
-import { UserContext } from '../Utilities/UserContext';
 import { stylesInput } from '../CommonComponents/Input'
 import { Button2 } from '../CommonComponents/Button'
-import { OneSignal } from 'react-native-onesignal';
 
-const LoginScreen = ({navigation}) => {
+const SignUpScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
-  const {setUserId, setUserRole, userRole, setToken, setUserName} = useContext(UserContext);
 
   const togglePasswordVisibility = () =>{
     setIsPasswordHidden(!isPasswordHidden);
   }
 
-  const handleLogin = async () => {
-    try{
-      const response = await fetch('https://waseminarcnpm2.azurewebsites.net/auth/sign-in',{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        }),
-      });
-      
-      if (response.ok){
-        const result = await response.json();
-        setUserId(result.data.id);
-        setUserRole(result.data.role);
-        setToken(result.data.token);
-        setUserName(username);
-        if (result.data.role === "client"){
-          await OneSignal.login(result.data.id);
-          navigation.navigate('Home');
+  const handleSignUp = async () => {
+    if (username === '' || password === ''){
+        Alert.alert('Error', 'Missing information');
+        return;
+    }
+    try {
+        const response = await fetch('https://waseminarcnpm2.azurewebsites.net/auth/sign-up',{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: username,
+              password: password,
+              role: 'client',
+            }),
+          });
+        if (response.status === 201){
+            await Alert.alert("Hooray~", "Sign up successfully");
+            navigation.navigate('Login');
         }
-      }
-      else{
-        Alert.alert("Login Failed");
-      }
     }
     catch (error){
-      Alert.alert("Something went wrong");
+        Alert.alert ("Error", `${error.message}`)
     }
   };
 
@@ -53,8 +44,9 @@ const LoginScreen = ({navigation}) => {
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <Image 
-          source={require('../assets/login.png')} 
-          style={styles.image}/>
+            source={require('../assets/add-user.png')} 
+            style={styles.image} 
+        />
         <TextInput
           style={[styles.inputUserName]}
           placeholder="Username"
@@ -77,17 +69,18 @@ const LoginScreen = ({navigation}) => {
             }}
             buttonStyle={styles.visibilityButton}
             onPress={togglePasswordVisibility}/>
+            
         </View>
         <View style={styles.navigateContainer}>
-            <Text>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                <Text style={styles.navigateText}>Sign Up</Text>
+            <Text>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.navigateText}>Log In</Text>
             </TouchableOpacity>
         </View>
       </View>
       <Button2
-        title="Log In" 
-        onPressEvent={async() => {await handleLogin()}}
+        title="Sign Up" 
+        onPressEvent={handleSignUp}
       />
     </View>
   );
@@ -144,4 +137,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default LoginScreen
+export default SignUpScreen
